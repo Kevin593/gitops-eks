@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/Kevin593//gitops-eks.git
+    repoURL: https://github.com/Kevin593//gitops-eks
     targetRevision: main
     path: tekton
 
