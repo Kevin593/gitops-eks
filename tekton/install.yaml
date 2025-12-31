@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: tekton-pipelines
+  name: tekton
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://storage.googleapis.com/tekton-releases/pipeline
-    targetRevision: latest
-    path: release.yaml
+    repoURL: https://github.com/Kevin593/gitops-eks
+    targetRevision: main
+    path: tekton
   destination:
     server: https://kubernetes.default.svc
     namespace: tekton-pipelines
@@ -16,3 +16,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
