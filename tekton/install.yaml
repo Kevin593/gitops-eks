@@ -1,20 +1,24 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
+apiVersion: v1
+kind: Namespace
 metadata:
-  name: tekton
-  namespace: argocd
+  name: tekton-pipelines
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tekton-test
+  namespace: tekton-pipelines
 spec:
-  project: default
-  source:
-    repoURL: https://github.com/Kevin593/gitops-eks
-    targetRevision: main
-    path: tekton
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: tekton-pipelines
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tekton-test
+  template:
+    metadata:
+      labels:
+        app: tekton-test
+    spec:
+      containers:
+        - name: pause
+          image: registry.k8s.io/pause:3.9
+
