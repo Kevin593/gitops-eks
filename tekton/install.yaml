@@ -3,7 +3,6 @@ kind: Namespace
 metadata:
   name: tekton-pipelines
 ---
-# Tekton Pipelines v0.60.0 (usa registry.k8s.io)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,7 +20,8 @@ spec:
     spec:
       containers:
         - name: controller
-          image: registry.k8s.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller:v0.60.0
+          image: registry.k8s.io/tekton-releases/github.com/tektoncd/pipeline/controller:v0.60.0
+          imagePullPolicy: IfNotPresent
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -40,4 +40,5 @@ spec:
     spec:
       containers:
         - name: webhook
-          image: registry.k8s.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook:v0.60.0
+          image: registry.k8s.io/tekton-releases/github.com/tektoncd/pipeline/webhook:v0.60.0
+          imagePullPolicy: IfNotPresent
