@@ -7,9 +7,9 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/Kevin593/gitops-eks   # Reemplaza <TU_USUARIO>
+    repoURL: https://github.com/Kevin593/gitops-eks
     targetRevision: master
-    path: argocd/tekton
+    path: tekton
 
   destination:
     server: https://kubernetes.default.svc
@@ -21,6 +21,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
 
 
 
