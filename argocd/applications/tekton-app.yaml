@@ -7,18 +7,21 @@ spec:
   project: default
 
   source:
-    repoURL: https://tekton.dev/charts
-    chart: tekton-pipelines
-    targetRevision: 0.60.0
+    repoURL: https://github.com/Kevin593/gitops-eks   # Reemplaza <TU_USUARIO>
+    targetRevision: master
+    path: argocd/tekton
+
   destination:
     server: https://kubernetes.default.svc
     namespace: tekton-pipelines
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
 
 
 
