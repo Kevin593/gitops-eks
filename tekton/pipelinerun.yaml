@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: demo-devops-run-
+  namespace: tekton-pipelines
+spec:
+  serviceAccountName: tekton-sa
+  pipelineRef:
+    name: demo-devops-pipeline
+  params:
+    - name: IMAGE
+      value: kevin593/demo-devops-app:latest
+    - name: GIT_REPO
+      value: https://github.com/Kevin593/gitops-eks.git
+    - name: GIT_BRANCH
+      value: main
+  workspaces:
+    - name: shared-workspace
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+
