@@ -20,16 +20,10 @@ spec:
         - "--dockerfile=/workspace/source/Dockerfile"
         - "--context=/workspace/source"
         - "--destination=$(params.IMAGE)"
-        - "--skip-tls-verify=true"
-        - "--insecure"
-      env:
-        - name: DOCKER_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: dockerhub-secret
-              key: username
-        - name: DOCKER_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: dockerhub-secret
-              key: password
+      volumeMounts:
+        - name: kaniko-secret
+          mountPath: /kaniko/.docker
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: dockerhub-secret
