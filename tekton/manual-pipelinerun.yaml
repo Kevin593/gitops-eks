@@ -8,10 +8,14 @@ spec:
     name: build-and-push-app
   params:
     - name: IMAGE
-      value: docker.io/<TU_USUARIO_DOCKER_HUB>/demo-devops-app:latest
+      value: docker.io/kevin593/demo-devops-app:latest
   workspaces:
     - name: source
-      # Esto le dice a Tekton que use tu repo actual como workspace
-      persistentVolumeClaim:
-        claimName: pvc-source
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
   serviceAccountName: kaniko
+
