@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: pipeline-run-node-app-git
+  namespace: tekton-pipelines
+spec:
+  pipelineRef:
+    name: pipeline-build-and-push-node-app
+  params:
+    - name: IMAGE
+      value: "kevin593/demo-devops-app:1.0.0"
+  workspaces:
+    - name: source
+      git:
+        url: "https://github.com/Kevin593/gitops-eks.git"
+        revision: "master"
