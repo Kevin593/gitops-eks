@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: pipeline-run-node-app-git
+  name: pipeline-run-node-app-kaniko
   namespace: tekton-pipelines
 spec:
   pipelineRef:
