@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: build-and-push-manual
+  namespace: tekton-pipelines
+spec:
+  pipelineRef:
+    name: build-and-push-app
+  params:
+    - name: IMAGE
+      value: docker.io/<TU_USUARIO_DOCKER_HUB>/demo-devops-app:latest
+  workspaces:
+    - name: source
+      # Esto le dice a Tekton que use tu repo actual como workspace
+      persistentVolumeClaim:
+        claimName: pvc-source
+  serviceAccountName: kaniko
