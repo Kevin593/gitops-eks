@@ -1,0 +1,14 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: github-listener
+  namespace: tekton-pipelines
+spec:
+  serviceAccountName: kaniko
+  triggers:
+    - name: github-push-trigger
+      bindings:
+        - ref: github-push-binding
+      template:
+        ref: build-and-push-template
+

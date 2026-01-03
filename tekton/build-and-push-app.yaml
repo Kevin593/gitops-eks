@@ -1,4 +1,3 @@
-# tekton/build-and-push-app.yaml
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -11,7 +10,23 @@ spec:
     - name: IMAGE
       type: string
   tasks:
-    - name: build-and-push-task
+    - name: git-clone
+      taskRef:
+        name: git-clone
+        kind: Task
+      workspaces:
+        - name: output
+          workspace: source
+      params:
+        - name: url
+          value: https://github.com/Kevin593/gitops-eks
+        - name: revision
+          value: master
+        - name: deleteExisting
+          value: "true"
+    - name: build-and-push
+      runAfter:
+        - git-clone
       taskRef:
         name: build-and-push-task
       params:
@@ -20,3 +35,4 @@ spec:
       workspaces:
         - name: source
           workspace: source
+

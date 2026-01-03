@@ -1,4 +1,3 @@
-# tekton/build-trigger.yaml
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
@@ -19,21 +18,13 @@ spec:
           name: build-and-push-app
         workspaces:
           - name: source
-            persistentVolumeClaim:
-              claimName: pvc-source
+            volumeClaimTemplate:
+              spec:
+                accessModes: ["ReadWriteOnce"]
+                resources:
+                  requests:
+                    storage: 1Gi
         params:
           - name: IMAGE
-            value: $(tt.params.IMAGE)
----
-apiVersion: triggers.tekton.dev/v1alpha1
-kind: EventListener
-metadata:
-  name: github-listener
-  namespace: tekton-pipelines
-spec:
-  triggers:
-    - name: github-push
-      binding:
-        ref: github-binding
-      template:
-        ref: build-and-push-template
+            value: "$(tt.params.IMAGE)"
+        serviceAccountName: kaniko
