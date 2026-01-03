@@ -1,0 +1,22 @@
+# tekton/build-and-push-app.yaml
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-and-push-app
+  namespace: tekton-pipelines
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: IMAGE
+      type: string
+  tasks:
+    - name: build-and-push-task
+      taskRef:
+        name: build-and-push-task
+      params:
+        - name: IMAGE
+          value: "$(params.IMAGE)"
+      workspaces:
+        - name: source
+          workspace: source

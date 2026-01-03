@@ -1,0 +1,39 @@
+# tekton/build-trigger.yaml
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: build-and-push-template
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: gitrevision
+    - name: gitrepositoryurl
+    - name: IMAGE
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: build-and-push-run-
+      spec:
+        pipelineRef:
+          name: build-and-push-app
+        workspaces:
+          - name: source
+            persistentVolumeClaim:
+              claimName: pvc-source
+        params:
+          - name: IMAGE
+            value: $(tt.params.IMAGE)
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: github-listener
+  namespace: tekton-pipelines
+spec:
+  triggers:
+    - name: github-push
+      binding:
+        ref: github-binding
+      template:
+        ref: build-and-push-template
