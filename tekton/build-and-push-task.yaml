@@ -12,6 +12,12 @@ spec:
     - name: source
       description: "Código fuente de la app"
   steps:
+    - name: clone
+      image: alpine/git
+      workingDir: /workspace/source
+      script: |
+        #!/bin/sh
+        git clone https://github.com/Kevin593/gitops-eks.git .
     - name: build
       image: docker:24.0.5
       workingDir: /workspace/source
@@ -25,4 +31,4 @@ spec:
         #!/bin/sh
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         docker push $(params.IMAGE)
-  serviceAccountName: tekton-docker
+

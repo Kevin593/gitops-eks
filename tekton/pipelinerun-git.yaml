@@ -9,8 +9,7 @@ spec:
   params:
     - name: IMAGE
       value: "kevin593/demo-devops-app:1.0.0"
+  serviceAccountName: tekton-docker
   workspaces:
     - name: source
-      git:
-        url: "https://github.com/Kevin593/gitops-eks"
-        revision: "master"
+      emptyDir: {}
