@@ -1,4 +1,3 @@
-# tekton/kaniko-task.yaml
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -24,8 +23,4 @@ spec:
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker
-  serviceAccountName: kaniko
-  volumes:
-    - name: docker-config
-      secret:
-        secretName: dockerhub-secret
+
