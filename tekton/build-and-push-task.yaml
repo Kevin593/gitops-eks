@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-and-push-node-app
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: IMAGE
+      description: "Docker image URL incluyendo repo y tag"
+      type: string
+  workspaces:
+    - name: source
+      description: "Código fuente de la app"
+  steps:
+    - name: build
+      image: docker:24.0.5
+      workingDir: /workspace/source
+      script: |
+        #!/bin/sh
+        docker build -t $(params.IMAGE) .
+    - name: push
+      image: docker:24.0.5
+      workingDir: /workspace/source
+      script: |
+        #!/bin/sh
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        docker push $(params.IMAGE)
+  serviceAccountName: tekton-docker
