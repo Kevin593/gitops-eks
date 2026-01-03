@@ -12,5 +12,5 @@ spec:
   workspaces:
     - name: source
       git:
-        url: "https://github.com/Kevin593/gitops-eks.git"
+        url: "https://github.com/Kevin593/gitops-eks"
         revision: "master"
