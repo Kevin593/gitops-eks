@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-push
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: IMAGE
+      type: string
+  tasks:
+    - name: build
+      taskRef:
+        kind: ClusterTask
+        name: kaniko
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)

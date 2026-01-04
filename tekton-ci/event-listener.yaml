@@ -1,0 +1,12 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: github-listener
+  namespace: tekton-pipelines
+spec:
+  triggers:
+    - name: github
+      bindings:
+        - ref: github-binding
+      template:
+        ref: github-template
