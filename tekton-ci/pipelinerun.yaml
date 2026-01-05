@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: nodejs-ci-run
+  namespace: tekton-pipelines
+spec:
+  serviceAccountName: tekton-sa
+  pipelineRef:
+    name: nodejs-ci
+  params:
+    - name: IMAGE
+      value: docker.io/kevin593/demo-devops-app:latest
+  workspaces:
+    - name: shared-workspace
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi

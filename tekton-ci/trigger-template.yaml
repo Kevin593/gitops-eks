@@ -1,18 +1,28 @@
-apiVersion: triggers.tekton.dev/v1beta1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
-  name: github-template
+  name: nodejs-template
   namespace: tekton-pipelines
 spec:
+  params:
+    - name: gitrevision
+    - name: gitrepositoryurl
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-
+        generateName: nodejs-ci-run-
       spec:
-        serviceAccountName: kaniko-sa
         pipelineRef:
-          name: build-push
+          name: nodejs-ci
         params:
           - name: IMAGE
-            value: kevin593/mi-app:latest
+            value: docker.io/kevin593/demo-devops-app:$(params.gitrevision)
+        workspaces:
+          - name: shared-workspace
+            volumeClaimTemplate:
+              spec:
+                accessModes: ["ReadWriteOnce"]
+                resources:
+                  requests:
+                    storage: 1Gi

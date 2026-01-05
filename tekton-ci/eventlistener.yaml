@@ -1,0 +1,13 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: nodejs-listener
+  namespace: tekton-pipelines
+spec:
+  serviceAccountName: tekton-sa
+  triggers:
+    - name: nodejs-trigger
+      binding:
+        name: nodejs-binding
+      template:
+        name: nodejs-template

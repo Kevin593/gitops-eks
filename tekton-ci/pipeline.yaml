@@ -1,17 +1,21 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: build-push
+  name: nodejs-ci
   namespace: tekton-pipelines
 spec:
   params:
     - name: IMAGE
       type: string
+  workspaces:
+    - name: shared-workspace
   tasks:
-    - name: build
+    - name: build-push
       taskRef:
-        kind: ClusterTask
-        name: kaniko
+        name: build-and-push
       params:
         - name: IMAGE
           value: $(params.IMAGE)
+      workspaces:
+        - name: source
+          workspace: shared-workspace
