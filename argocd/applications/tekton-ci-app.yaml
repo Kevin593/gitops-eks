@@ -5,19 +5,16 @@ metadata:
   namespace: argocd
 spec:
   project: default
-
   source:
     repoURL: https://github.com/Kevin593/gitops-eks
     targetRevision: master
     path: tekton-ci
-
   destination:
     server: https://kubernetes.default.svc
     namespace: tekton-pipelines
-
   syncPolicy:
     automated:
-      selfHeal: true   # ✅ OK
+      selfHeal: true
     syncOptions:
       - ApplyOutOfSyncOnly=true
 
