@@ -4,13 +4,20 @@ metadata:
   name: nodejs-ci
   namespace: tekton-pipelines
 spec:
+  params:
+    - name: IMAGE
+      type: string
   workspaces:
     - name: shared-workspace
   tasks:
     - name: build-and-push
       taskRef:
         name: build-and-push
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
       workspaces:
         - name: source
           workspace: shared-workspace
+
 

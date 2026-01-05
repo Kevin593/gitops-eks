@@ -7,18 +7,24 @@ spec:
   params:
     - name: IMAGE
       type: string
+    - name: DOCKERFILE
+      type: string
+      default: Dockerfile
+    - name: CONTEXT
+      type: string
+      default: .
   workspaces:
     - name: source
   steps:
-    - name: build
-      image: gcr.io/kaniko-project/executor:latest
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:v1.17.0
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
       args:
-        - --dockerfile=Dockerfile
-        - --context=$(workspaces.source.path)
-        - --destination=$(params.IMAGE)
+        - "--dockerfile=$(params.DOCKERFILE)"
+        - "--context=$(workspaces.source.path)/$(params.CONTEXT)"
+        - "--destination=$(params.IMAGE)"
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker
@@ -26,3 +32,4 @@ spec:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
+

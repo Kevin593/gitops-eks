@@ -6,7 +6,11 @@ metadata:
 spec:
   pipelineRef:
     name: nodejs-ci
+  params:
+    - name: IMAGE
+      value: docker.io/kevin593/demo-devops-app:latest
   workspaces:
     - name: shared-workspace
       emptyDir: {}
+
 
