@@ -21,16 +21,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-
-  managedNamespaceMetadata:
-    labels:
-      pod-security.kubernetes.io/enforce: baseline
-      pod-security.kubernetes.io/audit: baseline
-      pod-security.kubernetes.io/warn: baseline
-
-
-
-
-
-
-
