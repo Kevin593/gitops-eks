@@ -9,6 +9,10 @@ spec:
   params:
     - name: IMAGE
       value: docker.io/kevin593/demo-devops-app:latest
+    - name: GIT_URL
+      value: https://github.com/Kevin593/gitops-eks
+    - name: GIT_REVISION
+      value: master
   workspaces:
     - name: shared-workspace
       emptyDir: {}

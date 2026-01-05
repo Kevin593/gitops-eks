@@ -7,6 +7,10 @@ spec:
   params:
     - name: IMAGE
       type: string
+    - name: GIT_URL
+      type: string
+    - name: GIT_REVISION
+      type: string
   workspaces:
     - name: shared-workspace
   tasks:
@@ -16,8 +20,13 @@ spec:
       params:
         - name: IMAGE
           value: $(params.IMAGE)
+        - name: GIT_URL
+          value: $(params.GIT_URL)
+        - name: GIT_REVISION
+          value: $(params.GIT_REVISION)
       workspaces:
         - name: source
           workspace: shared-workspace
+
 
 

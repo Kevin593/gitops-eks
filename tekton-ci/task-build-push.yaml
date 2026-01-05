@@ -7,23 +7,27 @@ spec:
   params:
     - name: IMAGE
       type: string
-    - name: DOCKERFILE
+    - name: GIT_URL
       type: string
-      default: Dockerfile
-    - name: CONTEXT
+    - name: GIT_REVISION
       type: string
-      default: .
+      default: master
   workspaces:
     - name: source
   steps:
+    - name: clone-repo
+      image: alpine/git
+      script: |
+        git clone -b $(params.GIT_REVISION) $(params.GIT_URL) $(workspaces.source.path)
+
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.17.0
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
       args:
-        - "--dockerfile=$(params.DOCKERFILE)"
-        - "--context=$(workspaces.source.path)/$(params.CONTEXT)"
+        - "--dockerfile=$(workspaces.source.path)/Dockerfile"
+        - "--context=$(workspaces.source.path)"
         - "--destination=$(params.IMAGE)"
       volumeMounts:
         - name: docker-config
@@ -32,4 +36,3 @@ spec:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
-
