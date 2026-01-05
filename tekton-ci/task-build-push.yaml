@@ -16,30 +16,24 @@ spec:
   workspaces:
     - name: source
 
-  podTemplate:
+  stepTemplate:
     securityContext:
       runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
       seccompProfile:
         type: RuntimeDefault
 
   steps:
     - name: clone-repo
       image: alpine/git
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop: ["ALL"]
-        runAsNonRoot: true
       script: |
         git clone -b $(params.GIT_REVISION) $(params.GIT_URL) $(workspaces.source.path)
 
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.17.0
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop: ["ALL"]
-        runAsNonRoot: true
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
@@ -55,4 +49,3 @@ spec:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
-
