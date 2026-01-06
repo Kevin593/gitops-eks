@@ -5,27 +5,23 @@ metadata:
   namespace: tekton-pipelines
 spec:
   params:
-    - name: IMAGE
-      description: "Imagen completa con tag"
-      type: string
+    - name: image
+    - name: git-url
+    - name: git-revision
   workspaces:
-    - name: source
+    - name: shared-workspace
   steps:
-    - name: build
+    - name: clone
+      image: alpine/git
+      script: |
+        git clone -b $(params.git-revision) $(params.git-url) /workspace/shared-workspace
+
+    - name: build-push
       image: gcr.io/kaniko-project/executor:latest
-      command:
-        - /kaniko/executor
-      args:
-        - "--context=/workspace/source"
-        - "--dockerfile=/workspace/source/Dockerfile"
-        - "--destination=$(params.IMAGE)"
       env:
         - name: DOCKER_CONFIG
-          value: /tekton/home/.docker/
-  volumes:
-    - name: docker-config
-      secret:
-        secretName: dockerhub-secret
-  volumeMounts:
-    - name: docker-config
-      mountPath: /tekton/home/.docker
+          value: /tekton/home/.docker
+      args:
+        - --dockerfile=/workspace/shared-workspace/apps/Dockerfile
+        - --context=/workspace/shared-workspace/apps
+        - --destination=$(params.image)

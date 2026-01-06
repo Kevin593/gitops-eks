@@ -5,18 +5,23 @@ metadata:
   namespace: tekton-pipelines
 spec:
   params:
-    - name: IMAGE
-      type: string
+    - name: git-url
+    - name: git-revision
+    - name: image
   workspaces:
-    - name: source
+    - name: shared-workspace
   tasks:
-    - name: build-and-push-task
+    - name: build
       taskRef:
         name: build-and-push
-      workspaces:
-        - name: source
-          workspace: source
       params:
-        - name: IMAGE
-          value: $(params.IMAGE)
+        - name: git-url
+          value: $(params.git-url)
+        - name: git-revision
+          value: $(params.git-revision)
+        - name: image
+          value: $(params.image)
+      workspaces:
+        - name: shared-workspace
+          workspace: shared-workspace
 
