@@ -18,8 +18,8 @@ spec:
 
   steps:
     - name: clone
-      image: ghcr.io/tektoncd/catalog/git-clone:latest
-      workingDir: /workspace/shared-workspace
+      image: bitnami/git:2.43.0
+      workingDir: $(workspaces.shared-workspace.path)
       script: |
         git clone --single-branch --branch $(params.git-revision) $(params.git-url) .
 
@@ -33,4 +33,5 @@ spec:
         - "--dockerfile=Dockerfile"
         - "--context=."
         - "--destination=$(params.image)"
+
 
