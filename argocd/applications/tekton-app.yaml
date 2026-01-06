@@ -5,19 +5,21 @@ metadata:
   namespace: argocd
 spec:
   project: default
-
   source:
-    repoURL: https://github.com/Kevin593/gitops-eks
+    repoURL: https://github.com/Kevin593/gitops-eks.git
     targetRevision: master
     path: tekton
-
   destination:
     server: https://kubernetes.default.svc
     namespace: tekton-pipelines
-
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+  managedNamespaceMetadata:
+    labels:
+      pod-security.kubernetes.io/enforce: privileged
+      pod-security.kubernetes.io/audit: privileged
+      pod-security.kubernetes.io/warn: privileged
