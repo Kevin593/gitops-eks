@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: build-and-push-run
+  generateName: build-and-push-run-
   namespace: tekton-pipelines
 spec:
   serviceAccountName: tekton-build-sa
