@@ -16,12 +16,13 @@ spec:
   workspaces:
     - name: shared-workspace
 
-  steps:
-    - name: clone
-      image: alpine/git
-      workingDir: $(workspaces.shared-workspace.path)
-      script: |
-        git clone --single-branch --branch $(params.git-revision) $(params.git-url) .
+steps:
+  - name: clone
+    image: ghcr.io/tektoncd/catalog/git-clone:latest
+    workingDir: /workspace/shared-workspace
+    script: |
+      git clone --single-branch --branch $(params.git-revision) $(params.git-url) .
+
     
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:latest
