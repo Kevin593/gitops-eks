@@ -4,6 +4,7 @@ metadata:
   name: build-and-push-run
   namespace: tekton-pipelines
 spec:
+  serviceAccountName: tekton-build-sa
   pipelineRef:
     name: build-and-push-pipeline
   params:
