@@ -16,5 +16,5 @@ spec:
       value: docker.io/kevin593/gitops-eks:latest
   workspaces:
     - name: shared-workspace
-      persistentVolumeClaim:
-        claimName: git-source-pvc
+      emptyDir: {}
+
