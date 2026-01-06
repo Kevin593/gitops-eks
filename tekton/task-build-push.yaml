@@ -1,27 +1,36 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: build-and-push
   namespace: tekton-pipelines
 spec:
   params:
-    - name: image
     - name: git-url
+      type: string
     - name: git-revision
+      type: string
+      default: master
+    - name: image
+      type: string
+
   workspaces:
     - name: shared-workspace
+
   steps:
     - name: clone
       image: alpine/git
+      workingDir: $(workspaces.shared-workspace.path)
       script: |
-        git clone -b $(params.git-revision) $(params.git-url) /workspace/shared-workspace
-
-    - name: build-push
+        git clone --single-branch --branch $(params.git-revision) $(params.git-url) .
+    
+    - name: build-and-push
       image: gcr.io/kaniko-project/executor:latest
+      workingDir: $(workspaces.shared-workspace.path)/apps
       env:
         - name: DOCKER_CONFIG
-          value: /tekton/home/.docker
+          value: /kaniko/.docker/
       args:
-        - --dockerfile=/workspace/shared-workspace/apps/Dockerfile
-        - --context=/workspace/shared-workspace/apps
-        - --destination=$(params.image)
+        - "--dockerfile=Dockerfile"
+        - "--context=."
+        - "--destination=$(params.image)"
+
