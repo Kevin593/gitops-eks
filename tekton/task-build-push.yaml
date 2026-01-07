@@ -24,8 +24,8 @@ spec:
         git clone --single-branch --branch $(params.git-revision) $(params.git-url) .
 
     - name: build-and-push
-      image: gcr.io/kaniko-project/executor:v1.22.0
-      workingDir: $(workspaces.shared-workspace.path)
+      image: gcr.io/kaniko-project/executor:latest
+      workingDir: $(workspaces.shared-workspace.path)/apps
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker/
