@@ -24,12 +24,20 @@ spec:
         git clone --single-branch --branch $(params.git-revision) $(params.git-url) .
 
     - name: build-and-push
-      image: gcr.io/kaniko-project/executor:latest
+      image: docker.io/bitnami/kaniko:latest
       workingDir: $(workspaces.shared-workspace.path)/apps
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker/
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker
       args:
         - "--dockerfile=Dockerfile"
         - "--context=."
         - "--destination=$(params.image)"
+
+  volumes:
+    - name: docker-config
+      secret:
+        secretName: dockerhub-secret

@@ -5,8 +5,10 @@ metadata:
   namespace: tekton-pipelines
 spec:
   serviceAccountName: tekton-build-sa
+
   pipelineRef:
     name: build-and-push-pipeline
+
   params:
     - name: git-url
       value: https://github.com/Kevin593/gitops-eks
@@ -14,7 +16,9 @@ spec:
       value: master
     - name: image
       value: docker.io/kevin593/gitops-eks:latest
+
   workspaces:
     - name: shared-workspace
       emptyDir: {}
+
 

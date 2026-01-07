@@ -8,8 +8,10 @@ spec:
     - name: git-url
     - name: git-revision
     - name: image
+
   workspaces:
     - name: shared-workspace
+
   tasks:
     - name: build
       taskRef:
