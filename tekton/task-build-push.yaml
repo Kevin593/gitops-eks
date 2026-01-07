@@ -33,5 +33,3 @@ spec:
         - "--dockerfile=Dockerfile"
         - "--context=."
         - "--destination=$(params.image)"
-
-

@@ -49,7 +49,7 @@ module "eks" {
   eks_managed_node_groups = {
     default = {
       name           = "worker-group-tfm"
-      instance_types = ["t3.small"]
+      instance_types = ["t3.medium"]
       desired_size   = var.desired_capacity
       min_size       = var.min_size
       max_size       = var.max_size
