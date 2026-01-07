@@ -5,5 +5,4 @@ metadata:
   namespace: tekton-pipelines
 secrets:
   - name: dockerhub-secret
-imagePullSecrets:
-  - name: dockerhub-secret
+
