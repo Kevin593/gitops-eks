@@ -11,18 +11,18 @@ spec:
     - name: output
       description: Workspace donde se clonará el repo
   steps:
-    - name: clone
+    - name: step-clone
       image: alpine/git
       script: |
         #!/bin/sh
+        echo "Clonando repositorio..."
         git clone $(params.url) /workspace/output
-    - name: show-clone
+    - name: step-show-clone
       image: alpine
       script: |
         #!/bin/sh
         echo "Contenido del workspace después del clone:"
         ls -R /workspace/output
-
 
 
 
