@@ -18,7 +18,7 @@ spec:
     - name: source
 
   steps:
-    - name: build-and-push
+    - name: kaniko
       image: gcr.io/kaniko-project/executor:latest
       args:
         - "--dockerfile=$(params.DOCKERFILE)"
