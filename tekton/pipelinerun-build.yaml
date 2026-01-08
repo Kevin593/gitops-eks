@@ -4,19 +4,21 @@ metadata:
   generateName: build-and-push-run-
   namespace: tekton-pipelines
 spec:
-  serviceAccountName: tekton-build-sa
-
   pipelineRef:
     name: build-and-push-pipeline
 
   params:
-    - name: GIT_URL
-      value: https://github.com/TU_USUARIO/TU_REPO.git
-    - name: IMAGE
-      value: docker.io/TU_USUARIO_DOCKER/app-node:latest
+    - name: git-url
+      value: https://github.com/Kevin593/gitops-eks
+    - name: git-revision
+      value: master
+    - name: image
+      value: docker.io/kevin593/gitops-eks:latest
 
   workspaces:
     - name: shared-workspace
       emptyDir: {}
+
+  serviceAccountName: tekton-build-sa
 
 

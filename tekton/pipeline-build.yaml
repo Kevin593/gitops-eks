@@ -5,9 +5,12 @@ metadata:
   namespace: tekton-pipelines
 spec:
   params:
-    - name: GIT_URL
+    - name: git-url
       type: string
-    - name: IMAGE
+    - name: git-revision
+      type: string
+      default: master
+    - name: image
       type: string
 
   workspaces:
@@ -19,7 +22,9 @@ spec:
         name: git-clone
       params:
         - name: url
-          value: $(params.GIT_URL)
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
       workspaces:
         - name: output
           workspace: shared-workspace
@@ -30,11 +35,12 @@ spec:
       taskRef:
         name: build-and-push
       params:
-        - name: IMAGE
-          value: $(params.IMAGE)
+        - name: image
+          value: $(params.image)
       workspaces:
-        - name: source
+        - name: shared-workspace
           workspace: shared-workspace
+
 
 
 

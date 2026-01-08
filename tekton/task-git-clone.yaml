@@ -9,14 +9,16 @@ spec:
       type: string
     - name: revision
       type: string
-      default: main
+      default: master   # 👈 CAMBIADO A master
 
   workspaces:
     - name: output
 
   steps:
     - name: clone
-      image: alpine/git
+      image: alpine/git:2.43.0
+      workingDir: /workspace/output
       script: |
+        set -e
         git clone $(params.url) .
         git checkout $(params.revision)
