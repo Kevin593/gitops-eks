@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: git-clone
@@ -9,16 +9,13 @@ spec:
       type: string
     - name: revision
       type: string
-      default: master   # 👈 CAMBIADO A master
-
+      default: master
   workspaces:
     - name: output
-
   steps:
     - name: clone
-      image: alpine/git:2.43.0
-      workingDir: /workspace/output
+      image: alpine/git
       script: |
-        set -e
-        git clone $(params.url) .
-        git checkout $(params.revision)
+        git clone --branch $(params.revision) $(params.url) .
+      workingDir: $(workspaces.output.path)
+
