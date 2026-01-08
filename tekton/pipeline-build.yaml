@@ -31,3 +31,4 @@ spec:
       workspaces:
         - name: shared-workspace
           workspace: shared-workspace
+
