@@ -11,12 +11,13 @@ spec:
     serviceAccountName: tekton-build-sa
 
   params:
-    - name: url              # Debe coincidir con el parámetro de la Task
+    - name: url       # Debe coincidir con el parámetro de la Task
       value: https://github.com/kevin593/gitops-eks.git
     - name: image
       value: docker.io/kevin593/gitops-eks:latest
 
   workspaces:
-    - name: output           # Debe coincidir con el workspace de la Task
+    - name: output    # Debe coincidir con el workspace de la Task
       emptyDir: {}
+
 
