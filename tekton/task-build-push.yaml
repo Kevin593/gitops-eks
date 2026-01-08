@@ -7,8 +7,10 @@ spec:
   params:
     - name: image
       type: string
+
   workspaces:
     - name: shared-workspace
+
   steps:
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
@@ -17,16 +19,18 @@ spec:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
       args:
-        - --dockerfile=Dockerfile
+        - --dockerfile=./Dockerfile
         - --context=.
         - --destination=$(params.image)
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker
+
   volumes:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
+
 
 
 
