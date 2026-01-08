@@ -4,18 +4,17 @@ metadata:
   name: git-clone
   namespace: tekton-pipelines
 spec:
+  workspaces:
+    - name: output
   params:
-    - name: url
+    - name: repo-url
       type: string
     - name: revision
       type: string
-      default: master
-  workspaces:
-    - name: output
+      default: main
   steps:
     - name: clone
       image: alpine/git
       script: |
-        git clone --branch $(params.revision) $(params.url) .
-      workingDir: $(workspaces.output.path)
+        git clone -b $(params.revision) $(params.repo-url) $(workspaces.output.path)
 
