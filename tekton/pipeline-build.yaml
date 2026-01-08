@@ -4,11 +4,11 @@ metadata:
   name: build-and-push-pipeline
   namespace: tekton-pipelines
 spec:
-  workspaces:
-    - name: shared-workspace
   params:
     - name: repo-url
     - name: image
+  workspaces:
+    - name: shared-workspace
   tasks:
     - name: clone-repo
       taskRef:
@@ -31,4 +31,3 @@ spec:
       workspaces:
         - name: shared-workspace
           workspace: shared-workspace
-

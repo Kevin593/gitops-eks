@@ -5,21 +5,20 @@ metadata:
   namespace: tekton-pipelines
 spec:
   params:
-    - name: url
+    - name: repo-url
       type: string
       description: URL del repositorio a clonar
   workspaces:
     - name: output
       description: Workspace donde se clonará el repo
   steps:
-    - name: step-clone
+    - name: clone
       image: alpine/git
       script: |
         #!/bin/sh
         echo "Clonando repositorio..."
-        # Clonamos directamente en /workspace/output/gitops-eks para tener path fijo
-        git clone $(params.url) /workspace/output/gitops-eks
-    - name: step-show-clone
+        git clone $(params.repo-url) /workspace/output
+    - name: show
       image: alpine
       script: |
         #!/bin/sh
