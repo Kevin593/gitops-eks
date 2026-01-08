@@ -10,12 +10,8 @@ spec:
     name: build-and-push-pipeline
 
   params:
-    - name: git-url
-      value: https://github.com/Kevin593/gitops-eks
-    - name: git-revision
-      value: master
-    - name: image
-      value: docker.io/kevin593/gitops-eks:latest
+    - name: IMAGE
+      value: docker.io/kevin593/app-node:latest
 
   workspaces:
     - name: shared-workspace
