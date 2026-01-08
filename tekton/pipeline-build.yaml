@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1
+apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: build-and-push-pipeline
@@ -6,13 +6,12 @@ metadata:
 spec:
   params:
     - name: git-url
-      type: string
     - name: git-revision
-      type: string
     - name: image
-      type: string
+
   workspaces:
-    - name: shared-workspace
+    - name: shared-workspace   # 👈 MISMO NOMBRE
+
   tasks:
     - name: clone-repo
       taskRef:
@@ -35,11 +34,5 @@ spec:
         - name: image
           value: $(params.image)
       workspaces:
-        - name: source
+        - name: shared-workspace   # 👈 MISMO NOMBRE
           workspace: shared-workspace
-
-
-
-
-
-
