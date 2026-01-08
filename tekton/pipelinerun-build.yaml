@@ -1,21 +1,21 @@
-
-
-
-
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   generateName: build-and-push-run-
   namespace: tekton-pipelines
 spec:
-  serviceAccountName: tekton-build-sa
   pipelineRef:
     name: build-and-push-pipeline
+
+  taskRunTemplate:
+    serviceAccountName: tekton-build-sa
+
   params:
     - name: repo-url
-      value: https://github.com/kevin593/gitops-eks
+      value: https://github.com/kevin593/gitops-eks.git
     - name: image
       value: docker.io/kevin593/gitops-eks:latest
+
   workspaces:
     - name: shared-workspace
       emptyDir: {}
