@@ -24,7 +24,7 @@ spec:
         git clone --single-branch --branch $(params.git-revision) $(params.git-url) .
 
     - name: build-and-push
-      image: docker.io/bitnami/kaniko:latest
+      image: docker.io/bitnami/kaniko:1.23.2
       workingDir: $(workspaces.shared-workspace.path)/apps
       env:
         - name: DOCKER_CONFIG
@@ -41,3 +41,4 @@ spec:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
+
