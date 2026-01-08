@@ -10,7 +10,7 @@ spec:
     name: build-and-push-pipeline
 
   params:
-    - name: repo-url
+    - name: repo-url         # <-- cambiar de git-url a repo-url
       value: https://github.com/Kevin593/gitops-eks
     - name: image
       value: docker.io/kevin593/gitops-eks:latest
