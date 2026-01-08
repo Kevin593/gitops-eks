@@ -6,25 +6,20 @@ spec:
   params:
     - name: url
       type: string
-      description: "URL del repositorio a clonar"
-    - name: revision
-      type: string
-      description: "Branch o tag a clonar"
-      default: "main"
+      description: URL del repositorio a clonar
   workspaces:
     - name: output
-      description: "Workspace donde se clonará el repositorio"
+      description: Workspace donde se clonará el repo
   steps:
     - name: clone
       image: alpine/git
       script: |
-        echo "Clonando el repositorio..."
-        git clone $(params.url) .
-        git checkout $(params.revision)
-    
+        #!/bin/sh
+        git clone $(params.url) /workspace/output
     - name: show-clone
       image: alpine
       script: |
+        #!/bin/sh
         echo "Contenido del workspace después del clone:"
         ls -R /workspace/output
 
