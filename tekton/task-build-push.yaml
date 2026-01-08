@@ -7,23 +7,22 @@ spec:
   params:
     - name: image
       type: string
-      description: "Nombre completo de la imagen a subir, ej: docker.io/usuario/imagen:tag"
 
   workspaces:
     - name: shared-workspace
-      description: "Workspace compartido donde se clonará el repositorio"
 
   steps:
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
-      workingDir: /workspace/shared-workspace/gitops-eks/apps   # apunta a la carpeta apps donde está Dockerfile
+      # Ruta donde está el Dockerfile después del clone
+      workingDir: /workspace/shared-workspace/gitops-eks/apps
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
       args:
-        - --dockerfile=./Dockerfile      # Dockerfile dentro de apps/
-        - --context=.                     # contexto = toda la carpeta apps
-        - --destination=$(params.image)   # imagen destino con tag
+        - --dockerfile=./Dockerfile
+        - --context=.
+        - --destination=$(params.image)
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker
@@ -31,7 +30,8 @@ spec:
   volumes:
     - name: docker-config
       secret:
-        secretName: dockerhub-secret   # asegúrate que el secreto tenga usuario/contraseña correctos
+        secretName: dockerhub-secret
+
 
 
 

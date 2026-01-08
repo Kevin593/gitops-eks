@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: git-clone
+  namespace: tekton-pipelines
 spec:
   params:
     - name: url
@@ -16,13 +17,15 @@ spec:
       script: |
         #!/bin/sh
         echo "Clonando repositorio..."
-        git clone $(params.url) /workspace/output
+        # Clonamos directamente en /workspace/output/gitops-eks para tener path fijo
+        git clone $(params.url) /workspace/output/gitops-eks
     - name: step-show-clone
       image: alpine
       script: |
         #!/bin/sh
         echo "Contenido del workspace después del clone:"
         ls -R /workspace/output
+
 
 
 
