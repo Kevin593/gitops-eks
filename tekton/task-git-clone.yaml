@@ -2,20 +2,31 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: git-clone
-  namespace: tekton-pipelines
 spec:
   params:
-    - name: repo-url
+    - name: url
       type: string
+      description: "URL del repositorio a clonar"
     - name: revision
       type: string
-      default: master   # 👈 CAMBIO CLAVE
+      description: "Branch o tag a clonar"
+      default: "main"
   workspaces:
     - name: output
+      description: "Workspace donde se clonará el repositorio"
   steps:
     - name: clone
       image: alpine/git
       script: |
-        git clone -b $(params.revision) $(params.repo-url) $(workspaces.output.path)
+        echo "Clonando el repositorio..."
+        git clone $(params.url) .
+        git checkout $(params.revision)
+    
+    - name: show-clone
+      image: alpine
+      script: |
+        echo "Contenido del workspace después del clone:"
+        ls -R /workspace/output
+
 
 
