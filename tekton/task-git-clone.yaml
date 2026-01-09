@@ -16,14 +16,16 @@ spec:
       image: alpine/git
       script: |
         #!/bin/sh
+        set -e
         echo "Clonando repositorio..."
         git clone $(params.repo-url) /workspace/output
     - name: show
       image: alpine
       script: |
         #!/bin/sh
-        echo "Contenido del workspace después del clone:"
+        echo "Contenido del workspace:"
         ls -R /workspace/output
+
 
 
 

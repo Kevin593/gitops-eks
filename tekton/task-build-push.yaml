@@ -12,7 +12,7 @@ spec:
   steps:
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
-      workingDir: /workspace/shared-workspace/apps  # ✅ Path correcto
+      workingDir: /workspace/shared-workspace/gitops-eks/apps
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
@@ -28,7 +28,6 @@ spec:
       secret:
         secretName: dockerhub-secret
 
-        secretName: dockerhub-secret
 
 
 
