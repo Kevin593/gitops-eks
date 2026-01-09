@@ -1,35 +1,38 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: git-clone
+  name: git-clone-apps-only
   namespace: tekton-pipelines
 spec:
+  workspaces:
+    - name: shared-workspace
   params:
     - name: repo-url
       type: string
-  workspaces:
-    - name: output
+    - name: revision
+      type: string
+      default: master
   steps:
     - name: clone-apps-only
-      image: alpine/git
+      image: alpine/git:latest
       script: |
         #!/bin/sh
         set -e
 
-        echo "Clonando solo la carpeta apps/"
+        echo "Clonando solo la carpeta apps dentro del workspace"
 
-        cd /workspace/output
+        cd $(workspaces.shared-workspace.path)
+
         git init
         git remote add origin $(params.repo-url)
-        git config core.sparseCheckout true
+        git fetch origin $(params.revision)
+        git checkout FETCH_HEAD
 
-        mkdir -p .git/info
-        echo "apps/" > .git/info/sparse-checkout
-
-        git pull origin master
+        # eliminar todo excepto apps
+        find . -mindepth 1 -maxdepth 1 ! -name apps ! -name .git -exec rm -rf {} +
 
         echo "Contenido final:"
-        ls -R .
+        ls -R
 
 
 
