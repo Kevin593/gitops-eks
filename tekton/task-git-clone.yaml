@@ -19,20 +19,17 @@ spec:
         #!/bin/sh
         set -e
 
-        echo "Clonando solo la carpeta apps dentro del workspace"
+        echo "Clonando repo completo dentro del workspace"
 
         cd $(workspaces.shared-workspace.path)
 
-        git init
-        git remote add origin $(params.repo-url)
-        git fetch origin $(params.revision)
-        git checkout FETCH_HEAD
-
-        # eliminar todo excepto apps
-        find . -mindepth 1 -maxdepth 1 ! -name apps ! -name .git -exec rm -rf {} +
+        git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
+        mkdir -p apps
+        cp -r temp-repo/apps/* apps/
+        rm -rf temp-repo
 
         echo "Contenido final:"
-        ls -R
+        ls -R $(workspaces.shared-workspace.path)
 
 
 
