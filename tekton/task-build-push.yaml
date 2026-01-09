@@ -12,6 +12,14 @@ spec:
     - name: shared-workspace
 
   steps:
+    # 🔍 STEP DE DEBUG (TEMPORAL)
+    - name: debug-workspace
+      image: alpine
+      script: |
+        echo "Contenido del workspace:"
+        ls -R $(workspaces.shared-workspace.path)
+
+    # 🏗️ STEP DE KANIKO
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
       env:
