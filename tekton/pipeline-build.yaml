@@ -21,7 +21,7 @@ spec:
         - name: repo-url
           value: $(params.repo-url)
       workspaces:
-        - name: shared-workspace
+        - name: shared-workspace  # solo el nombre, no "workspace: ..."
 
     - name: debug-after-clone
       runAfter:
@@ -34,7 +34,7 @@ spec:
               echo "Contenido del workspace DESPUÉS de clone:"
               ls -R $(workspaces.shared-workspace.path)
         workspaces:
-          - name: shared-workspace
+          - name: shared-workspace  # solo el nombre
 
     - name: build-and-push
       runAfter:
@@ -45,5 +45,5 @@ spec:
         - name: image
           value: $(params.image)
       workspaces:
-        - name: shared-workspace
+        - name: shared-workspace  # solo el nombre
 
