@@ -7,32 +7,27 @@ spec:
   params:
     - name: image
       type: string
-
   workspaces:
     - name: shared-workspace
-
   steps:
-    # 🔍 STEP DE DEBUG (TEMPORAL)
     - name: debug-workspace
       image: alpine
       script: |
-        echo "Contenido del workspace:"
+        echo "Contenido del workspace ANTES de Kaniko:"
         ls -R $(workspaces.shared-workspace.path)
 
-    # 🏗️ STEP DE KANIKO
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
       args:
-        - --context=$(workspaces.shared-workspace.path)
-        - --dockerfile=apps/Dockerfile
+        - --context=$(workspaces.shared-workspace.path)/apps
+        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
         - --destination=$(params.image)
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker
-
   volumes:
     - name: docker-config
       secret:

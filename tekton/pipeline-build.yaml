@@ -24,9 +24,23 @@ spec:
         - name: shared-workspace
           workspace: shared-workspace
 
-    - name: build-and-push
+    - name: debug-after-clone
       runAfter:
         - clone-repo
+      taskSpec:
+        steps:
+          - name: debug-workspace
+            image: alpine
+            script: |
+              echo "Contenido del workspace DESPUÉS de clone:"
+              ls -R $(workspaces.shared-workspace.path)
+        workspaces:
+          - name: shared-workspace
+            workspace: shared-workspace
+
+    - name: build-and-push
+      runAfter:
+        - debug-after-clone
       taskRef:
         name: build-and-push
       params:
@@ -35,3 +49,4 @@ spec:
       workspaces:
         - name: shared-workspace
           workspace: shared-workspace
+
