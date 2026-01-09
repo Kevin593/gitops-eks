@@ -7,24 +7,30 @@ spec:
   params:
     - name: repo-url
       type: string
-      description: URL del repositorio a clonar
   workspaces:
     - name: output
-      description: Workspace donde se clonará el repo
   steps:
-    - name: clone
+    - name: clone-apps-only
       image: alpine/git
       script: |
         #!/bin/sh
         set -e
-        echo "Clonando repositorio..."
-        git clone $(params.repo-url) /workspace/output
-    - name: show
-      image: alpine
-      script: |
-        #!/bin/sh
-        echo "Contenido del workspace:"
-        ls -R /workspace/output
+
+        echo "Clonando solo la carpeta apps/"
+
+        cd /workspace/output
+        git init
+        git remote add origin $(params.repo-url)
+        git config core.sparseCheckout true
+
+        mkdir -p .git/info
+        echo "apps/" > .git/info/sparse-checkout
+
+        git pull origin master
+
+        echo "Contenido final:"
+        ls -R .
+
 
 
 
