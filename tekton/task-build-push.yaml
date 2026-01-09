@@ -17,7 +17,7 @@ spec:
           value: /kaniko/.docker
       args:
         - --context=$(workspaces.shared-workspace.path)/apps
-        - --dockerfile=Dockerfile
+        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
         - --destination=$(params.image)
       volumeMounts:
         - name: docker-config
@@ -26,6 +26,7 @@ spec:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
+
 
 
 
