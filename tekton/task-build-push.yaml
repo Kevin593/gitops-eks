@@ -16,8 +16,8 @@ spec:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
       args:
-        - --context=$(workspaces.shared-workspace.path)/apps
-        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
+        - --context=/workspace/shared-workspace/apps
+        - --dockerfile=/workspace/shared-workspace/apps/Dockerfile
         - --destination=$(params.image)
       volumeMounts:
         - name: docker-config
