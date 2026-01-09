@@ -22,7 +22,6 @@ spec:
           value: $(params.repo-url)
       workspaces:
         - name: shared-workspace
-          workspace: shared-workspace
 
     - name: debug-after-clone
       runAfter:
@@ -36,7 +35,6 @@ spec:
               ls -R $(workspaces.shared-workspace.path)
         workspaces:
           - name: shared-workspace
-            workspace: shared-workspace
 
     - name: build-and-push
       runAfter:
@@ -48,5 +46,4 @@ spec:
           value: $(params.image)
       workspaces:
         - name: shared-workspace
-          workspace: shared-workspace
 
