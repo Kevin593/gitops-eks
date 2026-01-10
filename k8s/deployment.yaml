@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitops-eks-app
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gitops-eks-app
+  template:
+    metadata:
+      labels:
+        app: gitops-eks-app
+    spec:
+      containers:
+        - name: gitops-eks-app
+          image: docker.io/kevin593/gitops-eks:latest
+          ports:
+            - containerPort: 3000
+      imagePullSecrets:
+        - name: dockerhub-secret
+

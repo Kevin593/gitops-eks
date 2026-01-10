@@ -12,32 +12,19 @@ spec:
     - name: revision
       type: string
       default: master
-
   workspaces:
     - name: shared-workspace
-
   steps:
     - name: clone-repo
       image: alpine/git:latest
       script: |
         #!/bin/sh
         set -e
-        echo "Clonando repo dentro del pod..."
         cd $(workspaces.shared-workspace.path)
         git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
         mkdir -p apps
         cp -r temp-repo/apps/* apps/
         rm -rf temp-repo
-        echo "Contenido final del workspace:"
-        ls -R $(workspaces.shared-workspace.path)
-
-    - name: debug-docker-secret
-      image: busybox
-      script: |
-        #!/bin/sh
-        echo "Revisando contenido de /kaniko/.docker"
-        ls -l /kaniko/.docker
-        cat /kaniko/.docker/config.json || echo "No se puede leer config.json"
 
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
@@ -52,11 +39,11 @@ spec:
         - name: docker-config
           mountPath: /kaniko/.docker/config.json
           subPath: .dockerconfigjson
-
   volumes:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
+
 
 
 

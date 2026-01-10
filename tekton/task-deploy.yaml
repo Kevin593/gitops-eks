@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: deploy-to-k8s
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: image
+      type: string
+  workspaces:
+    - name: shared-workspace
+  steps:
+    - name: copy-manifests
+      image: busybox
+      script: |
+        #!/bin/sh
+        set -e
+        mkdir -p $(workspaces.shared-workspace.path)/k8s
+        cp /workspace/k8s/* $(workspaces.shared-workspace.path)/k8s
+
+    - name: kubectl-apply
+      image: bitnami/kubectl:latest
+      script: |
+        #!/bin/sh
+        set -e
+        sed -i "s|image: .*|image: $(params.image)|" $(workspaces.shared-workspace.path)/k8s/deployment.yaml
+        kubectl apply -f $(workspaces.shared-workspace.path)/k8s
+
