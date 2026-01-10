@@ -9,6 +9,7 @@ spec:
       type: string
   workspaces:
     - name: shared-workspace
+    - name: k8s
   steps:
     - name: copy-manifests
       image: busybox
@@ -16,13 +17,16 @@ spec:
         #!/bin/sh
         set -e
         mkdir -p $(workspaces.shared-workspace.path)/k8s
-        cp /workspace/k8s/* $(workspaces.shared-workspace.path)/k8s
+        cp $(workspaces.k8s.path)/* $(workspaces.shared-workspace.path)/k8s
 
     - name: kubectl-apply
       image: bitnami/kubectl:latest
       script: |
         #!/bin/sh
         set -e
+        # Reemplazar la imagen en deployment.yaml
         sed -i "s|image: .*|image: $(params.image)|" $(workspaces.shared-workspace.path)/k8s/deployment.yaml
+        # Aplicar los manifests al cluster
         kubectl apply -f $(workspaces.shared-workspace.path)/k8s
+
 
