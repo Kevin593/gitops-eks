@@ -31,6 +31,17 @@ spec:
         echo "Contenido final del workspace:"
         ls -R $(workspaces.shared-workspace.path)
 
+    - name: check-docker-secret
+      image: busybox:latest
+      script: |
+        #!/bin/sh
+        echo "Revisando contenido de /kaniko/.docker"
+        ls -la /kaniko/.docker
+        cat /kaniko/.docker/config.json || echo "No se puede leer el config.json"
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker
+
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
       env:
@@ -48,6 +59,7 @@ spec:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
+
 
 
 
