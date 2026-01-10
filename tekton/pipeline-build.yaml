@@ -9,41 +9,24 @@ spec:
       type: string
     - name: image
       type: string
+    - name: revision
+      type: string
+      default: master
 
   workspaces:
     - name: shared-workspace
 
   tasks:
-    - name: clone-repo
-      taskRef:
-        name: git-clone-apps-only
-      params:
-        - name: repo-url
-          value: $(params.repo-url)
-      workspaces:
-        - name: shared-workspace  # solo el nombre, no "workspace: ..."
-
-    - name: debug-after-clone
-      runAfter:
-        - clone-repo
-      taskSpec:
-        steps:
-          - name: debug-workspace
-            image: alpine
-            script: |
-              echo "Contenido del workspace DESPUÉS de clone:"
-              ls -R $(workspaces.shared-workspace.path)
-        workspaces:
-          - name: shared-workspace  # solo el nombre
-
     - name: build-and-push
-      runAfter:
-        - debug-after-clone
       taskRef:
         name: build-and-push
       params:
+        - name: repo-url
+          value: $(params.repo-url)
         - name: image
           value: $(params.image)
+        - name: revision
+          value: $(params.revision)
       workspaces:
-        - name: shared-workspace  # solo el nombre
+        - name: shared-workspace
 

@@ -5,15 +5,30 @@ metadata:
   namespace: tekton-pipelines
 spec:
   params:
+    - name: repo-url
+      type: string
     - name: image
       type: string
+    - name: revision
+      type: string
+      default: master
+
   workspaces:
     - name: shared-workspace
+
   steps:
-    - name: debug-workspace
-      image: alpine
+    - name: clone-repo
+      image: alpine/git:latest
       script: |
-        echo "Contenido del workspace ANTES de Kaniko:"
+        #!/bin/sh
+        set -e
+        echo "Clonando repo dentro del mismo pod..."
+        cd $(workspaces.shared-workspace.path)
+        git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
+        mkdir -p apps
+        cp -r temp-repo/apps/* apps/
+        rm -rf temp-repo
+        echo "Contenido final del workspace:"
         ls -R $(workspaces.shared-workspace.path)
 
     - name: build-and-push
@@ -28,10 +43,12 @@ spec:
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker
+
   volumes:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
+
 
 
 
