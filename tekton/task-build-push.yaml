@@ -33,10 +33,21 @@ spec:
 
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
+      env:
+        - name: DOCKER_CONFIG
+          value: /kaniko/.docker
       args:
         - --context=$(workspaces.shared-workspace.path)/apps
         - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
         - --destination=$(params.image)
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker
+
+  volumes:
+    - name: docker-config
+      secret:
+        secretName: dockerhub-secret
 
 
 

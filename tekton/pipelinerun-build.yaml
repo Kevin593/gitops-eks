@@ -17,7 +17,6 @@ spec:
     - name: shared-workspace
       emptyDir: {}
 
-  serviceAccountName: tekton-build-sa
 
 
 
