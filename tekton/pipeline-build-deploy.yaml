@@ -12,8 +12,11 @@ spec:
     - name: revision
       type: string
       default: master
+
   workspaces:
     - name: shared-workspace
+    - name: k8s
+
   tasks:
     - name: build-and-push
       taskRef:
@@ -40,5 +43,5 @@ spec:
       workspaces:
         - name: shared-workspace
           workspace: shared-workspace
-
-
+        - name: k8s
+          workspace: k8s

@@ -24,9 +24,8 @@ spec:
       script: |
         #!/bin/sh
         set -e
-        # Reemplazar la imagen en deployment.yaml
         sed -i "s|image: .*|image: $(params.image)|" $(workspaces.shared-workspace.path)/k8s/deployment.yaml
-        # Aplicar los manifests al cluster
         kubectl apply -f $(workspaces.shared-workspace.path)/k8s
+
 
 
