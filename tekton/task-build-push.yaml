@@ -22,7 +22,7 @@ spec:
       script: |
         #!/bin/sh
         set -e
-        echo "Clonando repo dentro del mismo pod..."
+        echo "Clonando repo dentro del pod..."
         cd $(workspaces.shared-workspace.path)
         git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
         mkdir -p apps
@@ -31,16 +31,13 @@ spec:
         echo "Contenido final del workspace:"
         ls -R $(workspaces.shared-workspace.path)
 
-    - name: check-docker-secret
-      image: busybox:latest
+    - name: debug-docker-secret
+      image: busybox
       script: |
         #!/bin/sh
         echo "Revisando contenido de /kaniko/.docker"
-        ls -la /kaniko/.docker
-        cat /kaniko/.docker/config.json || echo "No se puede leer el config.json"
-      volumeMounts:
-        - name: docker-config
-          mountPath: /kaniko/.docker
+        ls -l /kaniko/.docker
+        cat /kaniko/.docker/config.json || echo "No se puede leer config.json"
 
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
@@ -53,12 +50,14 @@ spec:
         - --destination=$(params.image)
       volumeMounts:
         - name: docker-config
-          mountPath: /kaniko/.docker
+          mountPath: /kaniko/.docker/config.json
+          subPath: .dockerconfigjson
 
   volumes:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
+
 
 
 
