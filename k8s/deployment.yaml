@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: gitops-eks-app
-          image: docker.io/kevin593/gitops-eks:latest   # Image Updater reemplazará el tag
+          image: docker.io/kevin593/gitops-eks:20260111080001   # Image Updater reemplazará el tag
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
