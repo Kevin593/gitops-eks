@@ -13,27 +13,23 @@ spec:
   steps:
     - name: copy-manifests
       image: busybox
+      securityContext:
+        runAsUser: 0
       script: |
         #!/bin/sh
         set -e
-        # Crear carpeta editable en shared-workspace
         mkdir -p $(workspaces.shared-workspace.path)/k8s
-        # Copiar todos los manifests desde el workspace read-only
         cp -r $(workspaces.k8s.path)/* $(workspaces.shared-workspace.path)/k8s
-        echo "Manifests copiados a shared-workspace:"
-        ls -R $(workspaces.shared-workspace.path)/k8s
+        ls -l $(workspaces.shared-workspace.path)/k8s
 
     - name: kubectl-apply
       image: bitnami/kubectl:latest
+      securityContext:
+        runAsUser: 0
       script: |
         #!/bin/sh
         set -e
-        # Cambiar la imagen en el deployment usando la copia editable
-        sed -i "s|image: .*|image: $(params.image)|" $(workspaces.shared-workspace.path)/k8s/deployment.yaml
-        # Aplicar los manifests al cluster
+        ls -l $(workspaces.shared-workspace.path)/k8s
+        sed -i "s|image: .*|image: $(params.image)|" \
+          $(workspaces.shared-workspace.path)/k8s/deployment.yaml
         kubectl apply -f $(workspaces.shared-workspace.path)/k8s
-        echo "Manifests aplicados correctamente"
-
-
-
-
