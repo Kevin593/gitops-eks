@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: build-and-push
@@ -18,19 +18,52 @@ spec:
 
   steps:
     - name: clone-repo
-      image: alpine/git
+      image: alpine/git:latest
       script: |
         #!/bin/sh
-        git clone --branch $(params.revision) $(params.repo-url) /workspace/shared-workspace
+        set -e
+        echo "Clonando repo dentro del pod..."
+        cd $(workspaces.shared-workspace.path)
+        git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
+        mkdir -p apps
+        cp -r temp-repo/apps/* apps/
+        rm -rf temp-repo
+        echo "Contenido final del workspace:"
+        ls -R $(workspaces.shared-workspace.path)
+
+    - name: set-image-tag
+      image: busybox
+      script: |
+        #!/bin/sh
+        set -e
+        # Generar tag con fecha y hora: YYYYMMDD-HHMMSS
+        export IMAGE_TAG=$(date +%Y%m%d-%H%M%S)
+        echo "IMAGE_TAG=${IMAGE_TAG}" > $(workspaces.shared-workspace.path)/image-tag.txt
+        echo "Tag generado: ${IMAGE_TAG}"
+
+    - name: debug-docker-secret
+      image: busybox
+      script: |
+        #!/bin/sh
+        echo "Revisando contenido de /kaniko/.docker"
+        ls -l /kaniko/.docker
+        cat /kaniko/.docker/config.json || echo "No se puede leer config.json"
 
     - name: build-and-push
-      image: gcr.io/kaniko-project/executor:latest
-      script: |
-        #!/busybox/sh
-        TAG=$(date +%Y%m%d%H%M%S)  # Genera timestamp como tag
-        echo "Usando tag: $TAG"
-        /kaniko/executor \
-          --context=/workspace/shared-workspace \
-          --dockerfile=/workspace/shared-workspace/Dockerfile \
-          --destination=$(params.image):$TAG \
-          --skip-tls-verify
+      image: gcr.io/kaniko-project/executor:v1.23.2
+      env:
+        - name: DOCKER_CONFIG
+          value: /kaniko/.docker
+      args:
+        - --context=$(workspaces.shared-workspace.path)/apps
+        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
+        - --destination=$(params.image):$(cat $(workspaces.shared-workspace.path)/image-tag.txt)
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker/config.json
+          subPath: .dockerconfigjson
+
+  volumes:
+    - name: docker-config
+      secret:
+        secretName: dockerhub-secret

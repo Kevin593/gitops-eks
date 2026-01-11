@@ -24,9 +24,8 @@ spec:
         - name: repo-url
           value: $(params.repo-url)
         - name: image
-          value: $(params.image)   # NO incluimos el tag aquí
+          value: $(params.image)
         - name: revision
           value: $(params.revision)
       workspaces:
         - name: shared-workspace
-
