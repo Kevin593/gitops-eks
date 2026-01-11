@@ -13,7 +13,7 @@ spec:
     - name: image
       value: docker.io/kevin593/gitops-eks
     - name: tag
-      value: "20260111080000"  # Aquí pones un tag dinámico válido, puede ser timestamp o Git SHA
+      value: "20260111080001"  # Aquí pones un tag dinámico válido, puede ser timestamp o Git SHA
 
   workspaces:
     - name: shared-workspace
