@@ -4,8 +4,6 @@ metadata:
   name: build-and-push
   namespace: tekton-pipelines
 spec:
-  workspaces:
-    - name: shared-workspace
   params:
     - name: repo-url
       type: string
@@ -14,51 +12,25 @@ spec:
     - name: revision
       type: string
       default: master
-  results:
-    - name: image-tag
-      description: "Tag generado automáticamente"
+
+  workspaces:
+    - name: shared-workspace
 
   steps:
-    # Step 1: Generar tag con timestamp
-    - name: generate-tag
-      image: alpine:3.18
-      script: |
-        #!/bin/sh
-        TAG=$(date +%Y%m%d%H%M%S)
-        echo "Tag generado: $TAG"
-        echo -n $TAG > /tekton/results/image-tag
-
-    # Step 2: Clonar el repositorio
     - name: clone-repo
       image: alpine/git
       script: |
         #!/bin/sh
-        git clone --branch $(params.revision) $(params.repo-url) /workspace/shared
+        git clone --branch $(params.revision) $(params.repo-url) /workspace/shared-workspace
 
-    # Step 3: Construir y subir imagen a Docker Hub
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:latest
-      command:
-        - /kaniko/executor
-      args:
-        - "--context=/workspace/shared"
-        - "--dockerfile=/workspace/shared/Dockerfile"
-        - "--destination=$(params.image):$(results.image-tag.path)"
-        - "--insecure"   # Si necesitas
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      script: |
+        #!/busybox/sh
+        TAG=$(date +%Y%m%d%H%M%S)  # Genera timestamp como tag
+        echo "Usando tag: $TAG"
+        /kaniko/executor \
+          --context=/workspace/shared-workspace \
+          --dockerfile=/workspace/shared-workspace/Dockerfile \
+          --destination=$(params.image):$TAG \
+          --skip-tls-verify

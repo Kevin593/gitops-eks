@@ -6,21 +6,13 @@ metadata:
 spec:
   pipelineRef:
     name: build-and-push-pipeline
+
   params:
     - name: repo-url
       value: https://github.com/Kevin593/gitops-eks
     - name: image
       value: docker.io/kevin593/gitops-eks
-    - name: revision
-      value: master
+
   workspaces:
     - name: shared-workspace
       emptyDir: {}
-
-
-
-
-
-
-
-
