@@ -17,7 +17,7 @@ spec:
   source:
     repoURL: https://github.com/Kevin593/gitops-eks
     targetRevision: master
-    path: apps
+    path: k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: default
