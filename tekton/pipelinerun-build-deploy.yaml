@@ -4,10 +4,11 @@ metadata:
   generateName: build-and-deploy-run-
   namespace: tekton-pipelines
 spec:
-  serviceAccountName: tekton-sa
-
   pipelineRef:
     name: build-and-deploy-pipeline
+
+  taskRunTemplate:
+    serviceAccountName: tekton-sa
 
   params:
     - name: repo-url
@@ -24,14 +25,3 @@ spec:
     - name: k8s
       configMap:
         name: k8s-manifests-configmap
-
-
-
-
-
-
-
-
-
-
-
