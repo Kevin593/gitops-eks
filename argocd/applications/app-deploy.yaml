@@ -3,19 +3,26 @@ kind: Application
 metadata:
   name: gitops-eks-app
   namespace: argocd
+  annotations:
+    # Indica qué imagen debe vigilar Image Updater
+    argocd-image-updater.argoproj.io/image-list: app=docker.io/kevin593/gitops-eks
+    # Estrategia: usar siempre la build más reciente
+    argocd-image-updater.argoproj.io/app.update-strategy: newest-build
+    # Permite todos los tags (regex)
+    argocd-image-updater.argoproj.io/app.allow-tags: regexp:.*
+    # Método de actualización: modificar Git (GitOps)
+    argocd-image-updater.argoproj.io/write-back-method: git
 spec:
   project: default
-
   source:
-    repoURL: https://github.com/Kevin593/gitops-eks
+    repoURL: https://github.com/Kevin593/gitops-eks.git
     targetRevision: master
-    path: k8s
-
+    path: apps
   destination:
     server: https://kubernetes.default.svc
     namespace: default
-
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+

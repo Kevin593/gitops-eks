@@ -11,7 +11,11 @@ spec:
     - name: repo-url
       value: https://github.com/Kevin593/gitops-eks
     - name: image
-      value: docker.io/kevin593/gitops-eks:latest
+      value: docker.io/kevin593/gitops-eks
+    - name: image-tag
+      value: "$(date +%Y%m%d%H%M%S)"  # TAG único por timestamp
+    - name: revision
+      value: master
 
   workspaces:
     - name: shared-workspace
