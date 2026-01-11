@@ -7,9 +7,11 @@ spec:
   params:
     - name: image
       type: string
+
   workspaces:
     - name: shared-workspace
     - name: k8s
+
   steps:
     - name: copy-manifests
       image: busybox
@@ -18,8 +20,14 @@ spec:
       script: |
         #!/bin/sh
         set -e
+
+        echo "Creando directorio de trabajo..."
         mkdir -p $(workspaces.shared-workspace.path)/k8s
-        cp -r $(workspaces.k8s.path)/* $(workspaces.shared-workspace.path)/k8s
+
+        echo "Copiando manifests desde ConfigMap (rompiendo symlinks)..."
+        cp -Lr $(workspaces.k8s.path)/* $(workspaces.shared-workspace.path)/k8s
+
+        echo "Contenido copiado:"
         ls -l $(workspaces.shared-workspace.path)/k8s
 
     - name: kubectl-apply
@@ -29,7 +37,12 @@ spec:
       script: |
         #!/bin/sh
         set -e
-        ls -l $(workspaces.shared-workspace.path)/k8s
+
+        echo "Actualizando imagen en deployment.yaml..."
         sed -i "s|image: .*|image: $(params.image)|" \
           $(workspaces.shared-workspace.path)/k8s/deployment.yaml
+
+        echo "Aplicando manifests al cluster..."
         kubectl apply -f $(workspaces.shared-workspace.path)/k8s
+
+        echo "Deploy aplicado correctamente ✅"
