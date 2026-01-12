@@ -11,8 +11,14 @@ spec:
     - name: repo-url
       value: https://github.com/Kevin593/gitops-eks
     - name: image
-      value: docker.io/kevin593/gitops-eks
+      value: docker.io/kevin593/gitops-eks:latest
 
   workspaces:
     - name: shared-workspace
       emptyDir: {}
+
+
+
+
+
+

@@ -25,17 +25,9 @@ spec:
         echo "Clonando repo dentro del pod..."
         cd $(workspaces.shared-workspace.path)
         git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
-
-        cd temp-repo
-        COMMIT_SHA=$(git rev-parse --short HEAD)
-        echo "Commit SHA: $COMMIT_SHA"
-        echo "$COMMIT_SHA" > $(workspaces.shared-workspace.path)/commit-sha.txt
-
-        mkdir -p ../apps
-        cp -r apps/* ../apps/
-        cd ..
+        mkdir -p apps
+        cp -r temp-repo/apps/* apps/
         rm -rf temp-repo
-
         echo "Contenido final del workspace:"
         ls -R $(workspaces.shared-workspace.path)
 
@@ -52,16 +44,10 @@ spec:
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
-      script: |
-        #!/busybox/sh
-        set -e
-        COMMIT_SHA=$(cat $(workspaces.shared-workspace.path)/commit-sha.txt)
-        echo "Construyendo imagen con tag: $COMMIT_SHA"
-
-        /kaniko/executor \
-          --context=$(workspaces.shared-workspace.path)/apps \
-          --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile \
-          --destination=$(params.image):$COMMIT_SHA
+      args:
+        - --context=$(workspaces.shared-workspace.path)/apps
+        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
+        - --destination=$(params.image)
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker/config.json
@@ -71,3 +57,19 @@ spec:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
