@@ -22,51 +22,33 @@ spec:
       script: |
         #!/bin/sh
         set -e
-
-        echo "Clonando repositorio..."
+        echo "Clonando repo..."
         cd $(workspaces.shared-workspace.path)
 
         git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
 
         cd temp-repo
-        COMMIT_SHA=$(git rev-parse --short HEAD)
-        echo $COMMIT_SHA > ../commit-sha.txt
-        echo "Commit SHA detectado: $COMMIT_SHA"
+        git rev-parse --short HEAD > ../commit-sha.txt
+        echo "Commit SHA: $(cat ../commit-sha.txt)"
         cd ..
 
         mkdir -p apps
         cp -r temp-repo/apps/* apps/
         rm -rf temp-repo
 
-        echo "Workspace final:"
-        ls -R $(workspaces.shared-workspace.path)
-
-    - name: debug-docker-secret
-      image: busybox
-      script: |
-        #!/bin/sh
-        echo "Revisando /kaniko/.docker"
-        ls -l /kaniko/.docker
-        cat /kaniko/.docker/config.json || echo "No se puede leer config.json"
-
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
-      script: |
-        #!/busybox/sh
-        set -e
-
-        COMMIT_SHA=$(cat $(workspaces.shared-workspace.path)/commit-sha.txt)
-        IMAGE_BASE=$(echo $(params.image) | cut -d: -f1)
-
-        echo "Construyendo imagen: ${IMAGE_BASE}:${COMMIT_SHA}"
-
-        /kaniko/executor \
-          --context=$(workspaces.shared-workspace.path)/apps \
-          --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile \
-          --destination=${IMAGE_BASE}:${COMMIT_SHA}
+        - name: COMMIT_SHA
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['tekton.dev/taskrun']
+      args:
+        - --context=$(workspaces.shared-workspace.path)/apps
+        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
+        - --destination=$(params.image)-$(cat $(workspaces.shared-workspace.path)/commit-sha.txt)
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker/config.json
