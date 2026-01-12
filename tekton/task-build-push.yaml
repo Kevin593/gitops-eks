@@ -5,19 +5,56 @@ metadata:
   namespace: tekton-pipelines
 spec:
   params:
+    - name: repo-url
+      type: string
     - name: image
       type: string
-    - name: git-sha
+    - name: revision
       type: string
+      default: master
+
+  results:
+    - name: commit-sha
+      description: SHA del commit usado para el build
+
   workspaces:
-    - name: source
+    - name: shared-workspace
+
   steps:
+    - name: clone-repo
+      image: alpine/git:latest
+      script: |
+        #!/bin/sh
+        set -e
+        cd $(workspaces.shared-workspace.path)
+
+        git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
+
+        cd temp-repo
+        COMMIT_SHA=$(git rev-parse HEAD)
+        echo "Commit SHA: $COMMIT_SHA"
+        echo -n $COMMIT_SHA > $(results.commit-sha.path)
+
+        mkdir -p ../apps
+        cp -r apps/* ../apps/
+        cd ..
+        rm -rf temp-repo
+
     - name: build-and-push
-      image: gcr.io/kaniko-project/executor:latest
+      image: gcr.io/kaniko-project/executor:v1.23.2
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
       args:
-        - --dockerfile=$(workspaces.source.path)/Dockerfile
-        - --context=$(workspaces.source.path)
-        - --destination=$(params.image):$(params.git-sha)
+        - --context=$(workspaces.shared-workspace.path)/apps
+        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
+        - --destination=$(params.image):$(results.commit-sha)
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker/config.json
+          subPath: .dockerconfigjson
+
+  volumes:
+    - name: docker-config
+      secret:
+        secretName: dockerhub-secret

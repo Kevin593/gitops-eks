@@ -6,15 +6,19 @@ metadata:
 spec:
   params:
     - name: repo-url
+      type: string
     - name: image
+      type: string
+
   workspaces:
     - name: shared-workspace
+
   tasks:
     - name: clone-repo
       taskRef:
         name: git-clone
       params:
-        - name: url
+        - name: repo-url
           value: $(params.repo-url)
       workspaces:
         - name: output
