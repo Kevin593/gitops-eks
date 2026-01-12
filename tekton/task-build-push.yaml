@@ -26,33 +26,36 @@ spec:
       script: |
         #!/bin/sh
         set -e
-        echo "Clonando repo dentro del pod..."
         cd $(workspaces.shared-workspace.path)
         git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
         mkdir -p apps
         cp -r temp-repo/apps/* apps/
         rm -rf temp-repo
-        echo "Contenido final del workspace:"
-        ls -R $(workspaces.shared-workspace.path)
 
     - name: set-image-tag
       image: busybox
       script: |
         #!/bin/sh
-        set -e
-        IMAGE_TAG=$(date +%Y%m%d-%H%M%S)
-        echo "Tag generado: $IMAGE_TAG"
-        echo -n $IMAGE_TAG > $(results.image-tag.path)
+        TAG=$(date +%Y%m%d-%H%M%S)
+        echo -n "$TAG" > $(results.image-tag.path)
+        echo "Tag generado: $TAG"
 
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
+      command:
+        - /busybox/sh
       args:
-        - --context=$(workspaces.shared-workspace.path)/apps
-        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
-        - --destination=$(params.image):$(results.image-tag.path)
+        - -c
+        - |
+          TAG=$(cat /tekton/results/image-tag)
+          echo "Pusheando imagen: $(params.image):$TAG"
+          /kaniko/executor \
+            --context=$(workspaces.shared-workspace.path)/apps \
+            --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile \
+            --destination=$(params.image):$TAG
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker
