@@ -6,26 +6,30 @@ metadata:
 spec:
   params:
     - name: repo-url
-      type: string
     - name: image
-      type: string
-    - name: revision
-      type: string
-      default: master
-
   workspaces:
     - name: shared-workspace
-
   tasks:
+    - name: clone-repo
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repo-url)
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
     - name: build-and-push
+      runAfter:
+        - clone-repo
       taskRef:
         name: build-and-push
       params:
-        - name: repo-url
-          value: $(params.repo-url)
         - name: image
           value: $(params.image)
-        - name: revision
-          value: $(params.revision)
+        - name: git-sha
+          value: $(tasks.clone-repo.results.commit)
       workspaces:
-        - name: shared-workspace
+        - name: source
+          workspace: shared-workspace
