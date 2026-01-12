@@ -14,8 +14,10 @@ spec:
     - name: shared-workspace
 
   tasks:
+    # 1️⃣ Clonar el repositorio
     - name: clone-repo
       taskRef:
+        kind: Task
         name: git-clone
       params:
         - name: repo-url
@@ -24,12 +26,16 @@ spec:
         - name: output
           workspace: shared-workspace
 
+    # 2️⃣ Build + Push con Kaniko
     - name: build-and-push
       runAfter:
         - clone-repo
       taskRef:
+        kind: Task
         name: build-and-push
       params:
+        - name: repo-url
+          value: $(params.repo-url)
         - name: image
           value: $(params.image)
         - name: git-sha
