@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: build-and-push
+  name: build-and-push-debug
   namespace: tekton-pipelines
 spec:
   params:
@@ -17,38 +17,52 @@ spec:
     - name: shared-workspace
 
   steps:
+    # Paso 1: Clonar repositorio y extraer commit hash
     - name: clone-repo
       image: alpine/git:latest
       script: |
         #!/bin/sh
         set -e
-        echo "Clonando repo..."
+        echo "Clonando repo dentro del pod..."
         cd $(workspaces.shared-workspace.path)
-
         git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
-
-        cd temp-repo
-        git rev-parse --short HEAD > ../commit-sha.txt
-        echo "Commit SHA: $(cat ../commit-sha.txt)"
-        cd ..
-
         mkdir -p apps
         cp -r temp-repo/apps/* apps/
+        
+        # Obtener el commit hash corto
+        cd temp-repo
+        COMMIT_HASH=$(git rev-parse --short HEAD)
+        echo $COMMIT_HASH > $(workspaces.shared-workspace.path)/commit-hash.txt
+        cd ..
+        
         rm -rf temp-repo
+        echo "Contenido final del workspace después de clonar:"
+        ls -lR $(workspaces.shared-workspace.path)
 
+    # Paso intermedio de debug
+    - name: debug-workspace
+      image: busybox
+      script: |
+        #!/bin/sh
+        echo "Verificando que commit-hash.txt exista antes del build..."
+        ls -l $(workspaces.shared-workspace.path)
+        cat $(workspaces.shared-workspace.path)/commit-hash.txt || echo "Archivo commit-hash.txt NO encontrado"
+
+    # Paso 2: Build y push con Kaniko usando commit hash como tag
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
-        - name: COMMIT_SHA
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.annotations['tekton.dev/taskrun']
-      args:
-        - --context=$(workspaces.shared-workspace.path)/apps
-        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
-        - --destination=$(params.image)-$(cat $(workspaces.shared-workspace.path)/commit-sha.txt)
+      script: |
+        #!/bin/sh
+        set -e
+        TAG=$(cat $(workspaces.shared-workspace.path)/commit-hash.txt)
+        echo "Usando tag: $TAG"
+        /kaniko/executor \
+          --context=$(workspaces.shared-workspace.path)/apps \
+          --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile \
+          --destination=$(params.image):$TAG
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker/config.json
@@ -58,3 +72,4 @@ spec:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
+
