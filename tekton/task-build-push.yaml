@@ -2,68 +2,54 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: build-and-push
-  namespace: tekton-pipelines
 spec:
+  workspaces:
+    - name: shared-workspace
   params:
     - name: repo-url
       type: string
     - name: image
       type: string
-    - name: revision
-      type: string
-      default: master
-
-  workspaces:
-    - name: shared-workspace
+  results:
+    - name: sha
+      description: "SHA corto del último commit"
 
   steps:
+    # 1️⃣ Clonar el repositorio y copiar solo apps
     - name: clone-repo
-      image: alpine/git:latest
+      image: alpine/git
       script: |
         #!/bin/sh
         set -e
-        echo "Clonando repo dentro del pod..."
-        cd $(workspaces.shared-workspace.path)
-        git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
+        echo "Clonando repo..."
+        cd /workspace/shared-workspace
+        git clone --branch master --single-branch $(params.repo-url) temp-repo
 
-        # Copiar los apps
+        # Obtener SHA corto
+        SHA=$(git --git-dir=temp-repo/.git rev-parse --short HEAD)
+        echo "SHA encontrado: $SHA"
+        echo -n $SHA > /tekton/results/sha.result
+
+        # Copiar solo apps
         mkdir -p apps
         cp -r temp-repo/apps/* apps/
         rm -rf temp-repo
 
-        # Obtener el SHA del último commit
-        LAST_COMMIT_SHA=$(git --git-dir=apps/.git rev-parse --short HEAD)
-        echo $LAST_COMMIT_SHA > $(workspaces.shared-workspace.path)/commit-sha.txt
-
         echo "Contenido final del workspace:"
-        ls -R $(workspaces.shared-workspace.path)
-        echo "SHA guardado en commit-sha.txt:"
-        cat $(workspaces.shared-workspace.path)/commit-sha.txt
+        ls -R /workspace/shared-workspace
 
-    - name: debug-commit-sha
-      image: busybox
-      script: |
-        #!/bin/sh
-        echo "Revisando commit-sha.txt"
-        cat $(workspaces.shared-workspace.path)/commit-sha.txt || echo "Archivo no encontrado"
-
-    - name: debug-docker-secret
-      image: busybox
-      script: |
-        #!/bin/sh
-        echo "Revisando contenido de /kaniko/.docker"
-        ls -l /kaniko/.docker
-        cat /kaniko/.docker/config.json || echo "No se puede leer config.json"
-
+    # 2️⃣ Construir y pushear la imagen con Kaniko usando SHA como tag
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
+      command:
+        - /kaniko/executor
       args:
-        - --context=$(workspaces.shared-workspace.path)/apps
-        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
-        - --destination=$(params.image)
+        - --context=/workspace/shared-workspace/apps
+        - --dockerfile=/workspace/shared-workspace/apps/Dockerfile
+        - --destination=$(params.image):$(results.sha.result)
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker/config.json
