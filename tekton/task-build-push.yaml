@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: build-and-push-debug
+  name: build-and-push
   namespace: tekton-pipelines
 spec:
   params:
@@ -17,7 +17,6 @@ spec:
     - name: shared-workspace
 
   steps:
-    # Paso 1: Clonar repositorio y extraer commit hash
     - name: clone-repo
       image: alpine/git:latest
       script: |
@@ -26,43 +25,45 @@ spec:
         echo "Clonando repo dentro del pod..."
         cd $(workspaces.shared-workspace.path)
         git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
+
+        # Copiar los apps
         mkdir -p apps
         cp -r temp-repo/apps/* apps/
-        
-        # Obtener el commit hash corto
-        cd temp-repo
-        COMMIT_HASH=$(git rev-parse --short HEAD)
-        echo $COMMIT_HASH > $(workspaces.shared-workspace.path)/commit-hash.txt
-        cd ..
-        
         rm -rf temp-repo
-        echo "Contenido final del workspace después de clonar:"
-        ls -lR $(workspaces.shared-workspace.path)
 
-    # Paso intermedio de debug
-    - name: debug-workspace
+        # Obtener el SHA del último commit
+        LAST_COMMIT_SHA=$(git --git-dir=apps/.git rev-parse --short HEAD)
+        echo $LAST_COMMIT_SHA > $(workspaces.shared-workspace.path)/commit-sha.txt
+
+        echo "Contenido final del workspace:"
+        ls -R $(workspaces.shared-workspace.path)
+        echo "SHA guardado en commit-sha.txt:"
+        cat $(workspaces.shared-workspace.path)/commit-sha.txt
+
+    - name: debug-commit-sha
       image: busybox
       script: |
         #!/bin/sh
-        echo "Verificando que commit-hash.txt exista antes del build..."
-        ls -l $(workspaces.shared-workspace.path)
-        cat $(workspaces.shared-workspace.path)/commit-hash.txt || echo "Archivo commit-hash.txt NO encontrado"
+        echo "Revisando commit-sha.txt"
+        cat $(workspaces.shared-workspace.path)/commit-sha.txt || echo "Archivo no encontrado"
 
-    # Paso 2: Build y push con Kaniko usando commit hash como tag
+    - name: debug-docker-secret
+      image: busybox
+      script: |
+        #!/bin/sh
+        echo "Revisando contenido de /kaniko/.docker"
+        ls -l /kaniko/.docker
+        cat /kaniko/.docker/config.json || echo "No se puede leer config.json"
+
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
       env:
         - name: DOCKER_CONFIG
           value: /kaniko/.docker
-      script: |
-        #!/bin/sh
-        set -e
-        TAG=$(cat $(workspaces.shared-workspace.path)/commit-hash.txt)
-        echo "Usando tag: $TAG"
-        /kaniko/executor \
-          --context=$(workspaces.shared-workspace.path)/apps \
-          --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile \
-          --destination=$(params.image):$TAG
+      args:
+        - --context=$(workspaces.shared-workspace.path)/apps
+        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
+        - --destination=$(params.image)
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker/config.json
@@ -72,4 +73,3 @@ spec:
     - name: docker-config
       secret:
         secretName: dockerhub-secret
-
