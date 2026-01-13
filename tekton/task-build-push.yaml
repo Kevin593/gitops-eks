@@ -12,13 +12,12 @@ spec:
     - name: revision
       type: string
       default: master
+    - name: tag        # <-- agregamos este parámetro
+      type: string
+      default: latest
 
   workspaces:
     - name: shared-workspace
-
-  results:
-    - name: git-sha
-      description: "SHA corto del commit actual"
 
   steps:
     - name: clone-repo
@@ -26,25 +25,15 @@ spec:
       script: |
         #!/bin/sh
         set -e
-        echo "Clonando repo..."
+        echo "Clonando repo dentro del pod..."
         cd $(workspaces.shared-workspace.path)
         git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
         mkdir -p apps
         cp -r temp-repo/apps/* apps/
-        # Obtener SHA corto del commit
-        SHA=$(git --git-dir=temp-repo/.git rev-parse --short HEAD)
-        echo "Commit SHA: $SHA"
-        # Guardar SHA en el result
-        echo $SHA > $(results.git-sha.path)
         rm -rf temp-repo
+        echo "Contenido final del workspace:"
+        ls -R $(workspaces.shared-workspace.path)
 
-    - name: debug-docker-secret
-      image: busybox
-      script: |
-        #!/bin/sh
-        echo "Revisando /kaniko/.docker"
-        ls -l /kaniko/.docker
-        cat /kaniko/.docker/config.json || echo "No se puede leer config.json"
 
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
@@ -54,7 +43,7 @@ spec:
       args:
         - --context=$(workspaces.shared-workspace.path)/apps
         - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
-        - --destination=$(params.image):$(results.git-sha)
+        - --destination=$(params.image):$(params.tag)
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker/config.json

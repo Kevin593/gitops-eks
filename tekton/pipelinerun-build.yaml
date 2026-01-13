@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   generateName: build-and-push-run-
@@ -6,13 +6,13 @@ metadata:
 spec:
   pipelineRef:
     name: build-and-push-pipeline
-
   params:
     - name: repo-url
-      value: https://github.com/Kevin593/gitops-eks
+      value: https://github.com/kevin593/gitops-eks
     - name: image
-      value: docker.io/kevin593/gitops-eks
-
+      value: docker.io/kevin593/gitops-eks  # sin :latest, Kaniko usará el SHA
+    - name: revision
+      value: master
   workspaces:
     - name: shared-workspace
       emptyDir: {}
