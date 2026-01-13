@@ -29,4 +29,3 @@ spec:
           value: $(params.revision)
       workspaces:
         - name: shared-workspace
-
