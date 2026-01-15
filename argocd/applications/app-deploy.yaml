@@ -10,14 +10,14 @@ metadata:
     # Usar siempre la imagen más nueva
     argocd-image-updater.argoproj.io/app.update-strategy: newest-build
 
-    # SOLO tags válidos (SHA alfanumérico)
+    # SOLO tags válidos (SHA)
     argocd-image-updater.argoproj.io/app.allow-tags: regexp:^[a-z0-9]+$
 
-    # GitOps real
-    argocd-image-updater.argoproj.io/write-back-method: git
+    # GitOps real (CORRECTO)
+    argocd-image-updater.argoproj.io/app.write-back-method: git
 
     # Rama donde escribirá el cambio
-    argocd-image-updater.argoproj.io/git-branch: master
+    argocd-image-updater.argoproj.io/app.git-branch: master
 spec:
   project: default
   source:
