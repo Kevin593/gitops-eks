@@ -4,14 +4,20 @@ metadata:
   name: gitops-eks-app
   namespace: argocd
   annotations:
-    # Indica qué imagen debe vigilar Image Updater
+    # Imagen que vigila Image Updater
     argocd-image-updater.argoproj.io/image-list: app=docker.io/kevin593/gitops-eks
-    # Estrategia: usar siempre la build más reciente
+
+    # Usar siempre la imagen más nueva
     argocd-image-updater.argoproj.io/app.update-strategy: newest-build
-    # Permite todos los tags (regex)
-    argocd-image-updater.argoproj.io/app.allow-tags: regexp:.*
-    # Método de actualización: modificar Git (GitOps)
+
+    # SOLO tags válidos (SHA alfanumérico)
+    argocd-image-updater.argoproj.io/app.allow-tags: regexp:^[a-z0-9]+$
+
+    # GitOps real
     argocd-image-updater.argoproj.io/write-back-method: git
+
+    # Rama donde escribirá el cambio
+    argocd-image-updater.argoproj.io/git-branch: master
 spec:
   project: default
   source:
@@ -25,4 +31,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-

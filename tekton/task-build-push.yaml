@@ -12,7 +12,7 @@ spec:
     - name: revision
       type: string
       default: master
-    - name: tag        # <-- agregamos este parámetro
+    - name: tag        
       type: string
       default: latest
 
