@@ -4,21 +4,17 @@ metadata:
   name: gitops-eks-app
   namespace: argocd
   annotations:
-    # Imagen que vigila
+    # Imagen a vigilar (alias = app)
     argocd-image-updater.argoproj.io/image-list: app=docker.io/kevin593/gitops-eks
 
-    # Estrategia
+    # Estrategia por alias
     argocd-image-updater.argoproj.io/app.update-strategy: newest-build
-
-    # Tags SHA
     argocd-image-updater.argoproj.io/app.allow-tags: regexp:^[a-z0-9]+$
-
-    # 🔥 ESTA ES LA CLAVE 🔥
     argocd-image-updater.argoproj.io/app.force-update: "true"
 
-    # GitOps
-    argocd-image-updater.argoproj.io/app.write-back-method: git
-    argocd-image-updater.argoproj.io/app.git-branch: master
+    # 🔥 ESTAS SON GLOBALES (SIN app.)
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/git-branch: master
 spec:
   project: default
   source:
