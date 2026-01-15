@@ -5,21 +5,21 @@ metadata:
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: app=docker.io/kevin593/gitops-eks
-    argocd-image-updater.argoproj.io/app.update-strategy: newest-build
-    argocd-image-updater.argoproj.io/app.allow-tags: regexp:^[a-f0-9]{7,40}$
-    argocd-image-updater.argoproj.io/app.write-back-method: git
-    argocd-image-updater.argoproj.io/app.git-branch: master
+    argocd-image-updater.argoproj.io/app.update-strategy: latest
 spec:
   project: default
+
   source:
     repoURL: https://github.com/Kevin593/gitops-eks
     targetRevision: master
     path: k8s
+    kustomize: {}
+
   destination:
     server: https://kubernetes.default.svc
     namespace: default
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-
