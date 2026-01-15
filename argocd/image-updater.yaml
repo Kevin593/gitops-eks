@@ -1,0 +1,19 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: gitops-eks-updater
+  namespace: argocd
+spec:
+  interval: 2m
+  applications:
+    - name: gitops-eks-app
+      namespace: argocd
+      images:
+        - name: docker.io/kevin593/gitops-eks
+          updateStrategy: newest-build
+          allowTags:
+            regex: "^[a-z0-9]+$"
+          forceUpdate: true
+          writeBack:
+            git:
+              branch: master
