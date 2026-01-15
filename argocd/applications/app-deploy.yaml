@@ -3,6 +3,10 @@ kind: Application
 metadata:
   name: gitops-eks-app
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: app=docker.io/kevin593/gitops-eks
+    argocd-image-updater.argoproj.io/app.update-strategy: latest
+    argocd-image-updater.argoproj.io/app.pull-secret: pullsecret:argocd/dockerhub-creds
 spec:
   project: default
   source:
@@ -16,3 +20,4 @@ spec:
     automated:
       prune: true
       selfHeal: true
+
