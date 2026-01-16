@@ -1,3 +1,31 @@
+# =========================
+# ServiceAccount
+# =========================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-triggers-sa
+  namespace: tekton-pipelines
+---
+# =========================
+# ClusterRoleBinding
+# =========================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tekton-triggers-binding
+subjects:
+  - kind: ServiceAccount
+    name: tekton-triggers-sa
+    namespace: tekton-pipelines
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+---
+# =========================
+# EventListener
+# =========================
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
@@ -6,14 +34,22 @@ metadata:
 spec:
   serviceAccountName: tekton-triggers-sa
   triggers:
-    - name: github-trigger
+    - name: pr-merged-trigger
       interceptors:
         - ref:
             name: github
           params:
             - name: eventTypes
-              value: ["push"]
+              value: ["pull_request"]
+        - ref:
+            name: cel
+          params:
+            - name: filter
+              value: >
+                body.action == "closed" &&
+                body.pull_request.merged == true &&
+                body.pull_request.base.ref == "master"
       bindings:
-        - ref: github-binding
+        - ref: github-pr-merged-binding
       template:
         ref: build-and-push-template

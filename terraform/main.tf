@@ -36,6 +36,9 @@ module "eks" {
 
   cluster_name                             = var.cluster_name
   cluster_version                          = var.cluster_version
+
+  enable_irsa = true
+  
   cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true
 
