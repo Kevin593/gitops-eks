@@ -3,11 +3,14 @@ kind: Service
 metadata:
   name: gitops-eks-service
   namespace: default
+  labels:
+    app: gitops-eks-app
 spec:
   selector:
     app: gitops-eks-app
   ports:
-    - protocol: TCP
-      port: 80         # Puerto externo
-      targetPort: 3000 # Puerto donde corre Node.js
+    - name: http          # ⬅️ IMPORTANTE para Prometheus
+      protocol: TCP
+      port: 80
+      targetPort: 3000
   type: LoadBalancer
