@@ -1,28 +1,7 @@
 const express = require("express");
-const client = require("prom-client");
-
 const app = express();
-const VERSION = "1.0.32";
 
-/* ============================
-   Prometheus config
-============================ */
-
-// Registro de métricas
-const register = client.register;
-
-// Métricas por defecto (CPU, memoria, etc.)
-client.collectDefaultMetrics();
-
-// Endpoint para Prometheus
-app.get("/metrics", async (req, res) => {
-  res.set("Content-Type", register.contentType);
-  res.end(await register.metrics());
-});
-
-/* ============================
-   Endpoints de la app
-============================ */
+const VERSION = "1.0.76";
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK" });
