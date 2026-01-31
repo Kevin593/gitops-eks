@@ -9,7 +9,7 @@ spec:
   selector:
     app: gitops-eks-app
   ports:
-    - name: http          # ⬅️ IMPORTANTE para Prometheus
+    - name: http         
       protocol: TCP
       port: 80
       targetPort: 3000

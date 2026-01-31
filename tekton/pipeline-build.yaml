@@ -10,7 +10,7 @@ spec:
     - name: revision
       default: master
     - name: tag
-      default: ""   # evita ParameterMissing
+      default: ""   
   workspaces:
     - name: shared-workspace
   tasks:
