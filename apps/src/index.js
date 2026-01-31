@@ -2,7 +2,7 @@ const express = require("express");
 const client = require("prom-client");
 
 const app = express();
-const VERSION = "1.0.1";
+const VERSION = "1.0.2";
 
 /* ============================
    Prometheus config
@@ -38,6 +38,11 @@ const httpRequestDuration = new client.Histogram({
 ============================ */
 
 app.use((req, res, next) => {
+  // 🚫 Ignorar el endpoint /metrics
+  if (req.path === "/metrics") {
+    return next();
+  }
+
   const start = process.hrtime();
 
   res.on("finish", () => {
