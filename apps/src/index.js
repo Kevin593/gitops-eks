@@ -2,7 +2,7 @@ const express = require("express");
 const client = require("prom-client");
 
 const app = express();
-const VERSION = "1.0.2";
+const VERSION = "1.0.3";
 
 /* ============================
    Prometheus config
@@ -38,17 +38,21 @@ const httpRequestDuration = new client.Histogram({
 ============================ */
 
 app.use((req, res, next) => {
-  // 🚫 Ignorar el endpoint /metrics
-  if (req.path === "/metrics") {
-    return next();
-  }
+  const ignoredRoutes = [
+    "/metrics",
+    "/.env",
+    "/favicon.ico",
+    "/robots.txt"
+    // aquí puedes agregar más rutas que no quieras medir
+  ];
+
+  if (ignoredRoutes.includes(req.path)) return next();
 
   const start = process.hrtime();
 
   res.on("finish", () => {
     const diff = process.hrtime(start);
     const duration = diff[0] + diff[1] / 1e9;
-
     const route = req.route?.path || req.path;
 
     // Contador de peticiones
@@ -78,7 +82,7 @@ app.use((req, res, next) => {
    API
 ============================ */
 
-// ÚNICO endpoint de la API
+// Endpoint principal de la API
 app.get("/version", (req, res) => {
   res.json({ version: VERSION });
 });
