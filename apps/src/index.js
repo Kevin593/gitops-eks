@@ -1,50 +1,45 @@
 const express = require("express");
-const client = require("prom-client");
+const client = require("prom-client"); // librería para métricas Prometheus
 
 const app = express();
-const VERSION = "1.0.7";
+const VERSION = "1.0.6";
 
 /* ============================
    Prometheus metrics
 ============================ */
 
 // Registro de métricas
-const register = new client.Registry();
-client.collectDefaultMetrics({ register }); // CPU, memoria, GC, etc.
+const register = client.register;
 
-// Contador de peticiones por endpoint
+// Métrica de contador para peticiones
 const requestCounter = new client.Counter({
   name: "api_requests_total",
   help: "Total de peticiones a la API",
   labelNames: ["endpoint"]
 });
 
-// Histograma de tiempo de respuesta por endpoint
+// Métrica de histograma para tiempo de respuesta individual
 const responseHistogram = new client.Histogram({
   name: "api_response_time_seconds",
   help: "Tiempo de respuesta de cada solicitud en segundos",
   labelNames: ["endpoint"],
-  buckets: [0.001, 0.01, 0.1, 0.5, 1, 2, 5, 10]
+  buckets: [0.001, 0.01, 0.1, 0.5, 1, 2, 5, 10] // rangos para medir cada solicitud
 });
-
-// Registrar métricas en el registry
-register.registerMetric(requestCounter);
-register.registerMetric(responseHistogram);
 
 /* ============================
    Middleware para métricas
 ============================ */
 app.use((req, res, next) => {
   const end = responseHistogram.startTimer({ endpoint: req.path });
-  requestCounter.inc({ endpoint: req.path });
+  requestCounter.inc({ endpoint: req.path }); // contar petición
   res.on("finish", () => {
-    end();
+    end(); // registrar tiempo de respuesta al terminar
   });
   next();
 });
 
 /* ============================
-   Endpoints de la API
+   Endpoints
 ============================ */
 app.get("/version", (req, res) => {
   res.json({ version: VERSION });
