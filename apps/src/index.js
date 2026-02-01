@@ -2,7 +2,7 @@ const express = require("express");
 const client = require("prom-client"); // librería para métricas Prometheus
 
 const app = express();
-const VERSION = "1.0.6";
+const VERSION = "1.0.5";
 
 /* ============================
    Prometheus metrics
