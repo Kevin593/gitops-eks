@@ -1,7 +1,7 @@
 const express = require("express");
 
 const app = express();
-const VERSION = "1.0.120"; // aquí puedes cambiar la versión fácilmente
+const VERSION = "1.0.1203"; // aquí puedes cambiar la versión fácilmente
 
 /* ============================
    API

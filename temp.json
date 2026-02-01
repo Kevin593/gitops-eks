@@ -1,0 +1,15 @@
+{
+    "apiVersion": "v1",
+    "data": {
+        "password": "RTF0VjIxQUNKZWhOTDFhcA=="
+    },
+    "kind": "Secret",
+    "metadata": {
+        "creationTimestamp": "2026-01-09T21:03:09Z",
+        "name": "argocd-initial-admin-secret",
+        "namespace": "argocd",
+        "resourceVersion": "1924",
+        "uid": "b7a6d44e-2eb0-4440-877b-03d3a2a56b64"
+    },
+    "type": "Opaque"
+}
