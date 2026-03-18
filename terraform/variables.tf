@@ -12,7 +12,7 @@ variable "cluster_version" {
 variable "instance_types" {
   type        = list(string)
   description = "Tipos de instancias para los nodos worker"
-  default     = ["t3.large"]
+  default     = ["t3.medium"]
 }
 
 variable "desired_capacity" {

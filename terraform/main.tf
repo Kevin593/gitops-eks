@@ -34,8 +34,8 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.0"
 
-  cluster_name                             = var.cluster_name
-  cluster_version                          = var.cluster_version
+  cluster_name    = var.cluster_name
+  cluster_version = var.cluster_version
 
   enable_irsa = true
   
@@ -52,7 +52,7 @@ module "eks" {
   eks_managed_node_groups = {
     default = {
       name           = "worker-group-tfm"
-      instance_types = ["t3.medium"]
+      instance_types = ["t3.small"]
       desired_size   = var.desired_capacity
       min_size       = var.min_size
       max_size       = var.max_size
@@ -108,6 +108,7 @@ resource "helm_release" "argocd" {
   namespace  = "argocd"
 
   create_namespace = true
+
 
   values = [<<EOF
 server:
