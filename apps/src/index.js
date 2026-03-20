@@ -2,7 +2,7 @@ const express = require("express");
 const client = require("prom-client");
 
 const app = express();
-const VERSION = "1.0.1887898";
+const VERSION = "1.0.17898";
 
 /* ============================
    Prometheus metrics
