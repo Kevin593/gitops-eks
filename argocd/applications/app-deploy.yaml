@@ -5,9 +5,7 @@ metadata:
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: app=docker.io/kevin593/gitops-eks
-    argocd-image-updater.argoproj.io/gitops.update-strategy: newest-build
-    argocd-image-updater.argoproj.io/write-back-method: git
-    argocd-image-updater.argoproj.io/write-back-target: kustomization
+    argocd-image-updater.argoproj.io/app.update-strategy: latest
 spec:
   project: default
 
