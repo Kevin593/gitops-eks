@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: gitops-eks-app
-          image: docker.io/kevin593/gitops-eks:latest
+          image: docker.io/kevin593/gitops-eks:dc241c4
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
