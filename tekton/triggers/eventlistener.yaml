@@ -41,18 +41,6 @@ spec:
           params:
             - name: eventTypes
               value: ["pull_request"]
-            - name: secretRef   # 👈 ESTA ES LA CLAVE
-              value:
-                secretName: github-secret
-                secretKey: secretToken
-        - ref:
-            name: cel
-          params:
-            - name: filter
-              value: >
-                body.action == "closed" &&
-                body.pull_request.merged == true &&
-                body.pull_request.base.ref == "master"
       bindings:
         - ref: github-pr-merged-binding
       template:
