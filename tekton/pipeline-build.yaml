@@ -1,0 +1,56 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: build-and-push-pipeline
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: repo-url
+    - name: image
+    - name: revision
+      default: master
+    - name: tag
+      default: ""   
+  workspaces:
+    - name: shared-workspace
+  tasks:
+    - name: get-git-sha
+      taskSpec:
+        params:
+          - name: repo-url
+          - name: revision
+        results:
+          - name: sha
+        steps:
+          - name: get-sha
+            image: alpine/git
+            script: |
+              #!/bin/sh
+              set -e
+              cd /workspace
+              git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
+              cd temp-repo
+              # Eliminamos salto de línea para que Kaniko acepte el SHA como tag
+              SHA=$(git rev-parse --short HEAD | tr -d -c '[:alnum:]' | tr -d '\r\n')
+              echo -n $SHA > /tekton/results/sha
+      params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+
+    - name: build-and-push
+      taskRef:
+        name: build-and-push
+      workspaces:
+        - name: shared-workspace
+          workspace: shared-workspace
+      params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: image
+          value: $(params.image)
+        - name: revision
+          value: $(params.revision)
+        - name: tag
+          value: $(tasks.get-git-sha.results.sha)

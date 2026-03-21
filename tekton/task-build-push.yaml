@@ -1,0 +1,55 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build-and-push
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: repo-url
+      type: string
+    - name: image
+      type: string
+    - name: revision
+      type: string
+      default: master
+    - name: tag        
+      type: string
+      default: latest
+
+  workspaces:
+    - name: shared-workspace
+
+  steps:
+    - name: clone-repo
+      image: alpine/git:latest
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Clonando repo dentro del pod..."
+        cd $(workspaces.shared-workspace.path)
+        git clone --branch $(params.revision) --single-branch $(params.repo-url) temp-repo
+        mkdir -p apps
+        cp -r temp-repo/apps/* apps/
+        rm -rf temp-repo
+        echo "Contenido final del workspace:"
+        ls -R $(workspaces.shared-workspace.path)
+
+
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:v1.23.2
+      env:
+        - name: DOCKER_CONFIG
+          value: /kaniko/.docker
+      args:
+        - --context=$(workspaces.shared-workspace.path)/apps
+        - --dockerfile=$(workspaces.shared-workspace.path)/apps/Dockerfile
+        - --destination=$(params.image):$(params.tag)
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker/config.json
+          subPath: .dockerconfigjson
+
+  volumes:
+    - name: docker-config
+      secret:
+        secretName: dockerhub-secret

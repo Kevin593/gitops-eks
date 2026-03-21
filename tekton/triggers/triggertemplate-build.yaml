@@ -1,0 +1,28 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: build-and-push-template
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: repo-url
+    - name: revision
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        generateName: build-and-push-run-
+        namespace: tekton-pipelines
+      spec:
+        pipelineRef:
+          name: build-and-push-pipeline
+        params:
+          - name: repo-url
+            value: $(tt.params.repo-url)
+          - name: image
+            value: docker.io/kevin593/gitops-eks
+          - name: revision
+            value: $(tt.params.revision)
+        workspaces:
+          - name: shared-workspace
+            emptyDir: {}
